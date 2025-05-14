@@ -41,13 +41,16 @@
         }
         .config-item-details {
             flex-grow: 1;
+            margin-right: 10px; /* Space between details and actions */
         }
         .config-item strong {
             color: var(--suds-text-heading);
             font-size: 1.1em;
+            display: block; /* Ensure it takes full width before other p tags */
+            margin-bottom: 3px;
         }
         .config-item p {
-            margin: 5px 0;
+            margin: 3px 0;
             font-size: 0.9em;
             color: var(--suds-text-dark);
         }
@@ -64,7 +67,10 @@
             cursor: pointer;
             font-size: 0.9em;
             transition: background-color 0.2s;
-            margin-left: 10px;
+            margin-left: 10px; /* Spacing between action buttons */
+        }
+        .config-item-actions button:first-child {
+            margin-left: 0; /* No left margin for the first button */
         }
         .config-item-actions button:hover {
             background-color: #a53c3a;
@@ -88,7 +94,7 @@
             box-sizing: border-box;
         }
         
-        .action-buttons-container { /* For centering buttons */
+        .action-buttons-container {
             text-align: center;
             margin-bottom: 20px;
         }
@@ -120,16 +126,39 @@
             margin-top: 0;
             border-bottom: 1px solid var(--suds-blue);
             padding-bottom: 10px;
+            font-size: 1.4em; /* Match other H3 styling */
+        }
+        .api-key-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
         }
         #api-key-input {
-            width: calc(100% - 24px);
-            padding: 10px;
-            margin-bottom: 15px;
+            flex-grow: 1; /* Allow input to take available space */
+            padding: 10px 12px;
             border: 1px solid var(--suds-border-light);
             border-radius: 5px;
             font-size: 0.9em;
+            font-family: 'Montserrat', sans-serif;
+            margin-right: 10px; /* Space before save button */
         }
-        #generate-proposal-btn {
+        #save-api-key-btn {
+            padding: 10px 18px; 
+            background-color: var(--suds-blue); 
+            color:white; 
+            border:none; 
+            border-radius:5px; 
+            cursor:pointer;
+            font-size: 0.9em;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        #save-api-key-btn:hover {
+            background-color: #16699b;
+        }
+
+        #generate-proposal-btn { /* Already styled by .action-buttons-container button */
             background-color: var(--suds-green);
         }
         #generate-proposal-btn:hover {
@@ -141,25 +170,51 @@
             background-color: #fff;
             border: 1px solid var(--suds-border-light);
             border-radius: 5px;
-            white-space: pre-wrap; /* To preserve formatting from AI */
+            white-space: pre-wrap; 
             min-height: 100px;
-            font-family: monospace;
+            font-family: monospace; /* Good for pre-formatted text */
             font-size: 0.9em;
+            line-height: 1.4;
         }
         #proposal-status {
             margin-top: 10px;
             font-style: italic;
             color: var(--suds-text-dark);
+            text-align: center;
         }
 
 
          @media (max-width: 768px) {
             body { padding-top: 110px; } 
-            .config-item { flex-direction: column; align-items: flex-start;}
-            .config-item-actions { margin-top: 10px; width: 100%; display: flex; }
-            .config-item-actions button { flex-grow: 1; margin-left: 0; margin-right: 5px;}
-            .config-item-actions button:last-child { margin-right: 0;}
-            .action-buttons-container button { display: block; margin: 10px auto; }
+            .config-item { 
+                flex-direction: column; 
+                align-items: flex-start;
+            }
+            .config-item-actions { 
+                margin-top: 10px; 
+                width: 100%; 
+                display: flex; 
+            }
+            .config-item-actions button { 
+                flex-grow: 1; 
+                margin-left: 0; 
+                margin-right: 5px;
+            }
+            .config-item-actions button:last-child { 
+                margin-right: 0;
+            }
+            .action-buttons-container button { 
+                display: block; 
+                margin: 10px auto; 
+            }
+            .api-key-group {
+                flex-direction: column;
+                align-items: stretch; /* Make input and button full width */
+            }
+            #api-key-input {
+                margin-right: 0;
+                margin-bottom: 10px; /* Space between input and button on mobile */
+            }
         }
     </style>
 </head>
@@ -187,9 +242,12 @@
 
         <div class="proposal-section">
             <h2>Generate Project Proposal</h2>
-            <div class="suds-form-group">
-                <label for="api-key-input" class="suds-label" style="color: var(--suds-text-dark);">AI API Key:</label>
-                <input type="password" id="api-key-input" placeholder="Enter your AI API Key here">
+            <div class="suds-form-group"> <!-- Using suds-form-group for consistent spacing -->
+                <label for="api-key-input" class="suds-label" style="color: var(--suds-text-dark); font-weight: 600;">AI API Key (e.g., OpenAI):</label>
+                <div class="api-key-group">
+                    <input type="password" id="api-key-input" placeholder="Enter your AI API Key here">
+                    <button id="save-api-key-btn">Save Key</button> 
+                </div>
             </div>
             <div class="action-buttons-container">
                 <button id="generate-proposal-btn">Generate Proposal from All Saved Configurations</button>
@@ -202,5 +260,8 @@
     </div>
 
     <script src="js/all_configs.js"></script>
+    <!-- If using Markdown rendering for proposal:
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> 
+    -->
 </body>
 </html>

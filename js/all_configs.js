@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const proposalStatusDiv = document.getElementById('proposal-status');
     const savedConfigStorageKey = 'sudsSavedConfigs';
 
-    // --- Configuration Loading and Management (same as before) ---
+    // --- Configuration Loading and Management (remains the same) ---
     function loadConfigurations() {
         configList.innerHTML = ''; 
         const storedData = localStorage.getItem(savedConfigStorageKey);
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
             configList.innerHTML = '<p>No product configurations saved yet. Use the configurator tools to save some!</p>';
             exportButton.style.display = 'none';
             clearAllButton.style.display = 'none';
-            generateProposalButton.disabled = true; // Disable proposal if no configs
+            generateProposalButton.disabled = true;
             return;
         }
         exportButton.style.display = 'inline-block';
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
     generateProposalButton.addEventListener('click', async function() {
         const apiKey = apiKeyInput.value.trim();
         if (!apiKey) {
-            alert('Please enter your AI API Key.');
+            alert('Please enter your OpenAI API Key.');
             apiKeyInput.focus();
             return;
         }
@@ -180,61 +180,128 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         proposalStatusDiv.textContent = 'Generating proposal... Please wait.';
-        proposalOutputDiv.textContent = '';
+        proposalOutputDiv.textContent = ''; // Clear previous proposal
         generateProposalButton.disabled = true;
 
-        // Prepare data for the AI. You might want to simplify or structure this.
-        const configurationsSummary = configs.map(config => {
-            return `Product: ${config.derived_product_name || config.product_type}, Code: ${config.generated_product_code || 'N/A'}, Key Details: ${JSON.stringify(config.details || config.chamber_details || config.separator_details || config.catchpit_details || config.flow_control_params || {})}`;
-        }).join('\n - ');
+        // Prepare a more structured summary for the AI
+        const configurationsDetails = configs.map(config => {
+            let details = `Product Type: ${config.product_type || 'N/A'}\n`;
+            details += `Derived Name: ${config.derived_product_name || 'N/A'}\n`;
+            details += `Product Code: ${config.generated_product_code || 'N/A'}\n`;
+            
+            // Add specific details based on product type
+            if (config.catchpit_details) {
+                details += `  Catchpit Type: ${config.catchpit_details.catchpit_type || 'N/A'}\n`;
+                details += `  Depth: ${config.catchpit_details.depth_mm || 'N/A'}mm\n`;
+                details += `  Pipework: ${config.catchpit_details.pipework_diameter || 'N/A'}\n`;
+                details += `  Target Pollutant: ${config.catchpit_details.target_pollutant || 'N/A'}\n`;
+                details += `  Removable Bucket: ${config.catchpit_details.removable_bucket ? 'Yes' : 'No'}\n`;
+            } else if (config.chamber_details && config.flow_control_params) { // Orifice
+                details += `  Chamber Depth: ${config.chamber_details.chamber_depth_mm || 'N/A'}mm\n`;
+                details += `  Chamber Diameter: ${config.chamber_details.chamber_diameter || 'N/A'}\n`;
+                details += `  Target Flow: ${config.flow_control_params.target_flow_lps || 'N/A'} L/s\n`;
+                details += `  Head Height: ${config.flow_control_params.design_head_m || 'N/A'} m\n`;
+                details += `  Bypass: ${config.flow_control_params.bypass_required ? 'Yes' : 'No'}\n`;
+            } else if (config.main_chamber && config.inlets) { // Universal Chamber
+                details += `  System: ${config.system_type_selection || 'N/A'}\n`;
+                details += `  Application: ${config.water_application_selection || 'N/A'}\n`;
+                details += `  Chamber Depth: ${config.main_chamber.chamber_depth_mm || 'N/A'}mm\n`;
+                details += `  Chamber Diameter: ${config.main_chamber.chamber_diameter || 'N/A'}\n`;
+                details += `  Inlets (${config.inlets.length}):\n`;
+                config.inlets.forEach(inlet => {
+                    details += `    - Pos: ${inlet.position}, Size: ${inlet.pipe_size || 'N/A'}, Material: ${inlet.pipe_material || 'N/A'} ${inlet.pipe_material_other ? `(${inlet.pipe_material_other})` : ''}\n`;
+                });
+            } else if (config.separator_details) { // Separator
+                details += `  Depth: ${config.separator_details.depth_mm || 'N/A'}mm\n`;
+                details += `  Flow Rate: ${config.separator_details.flow_rate_lps || 'N/A'} L/s\n`;
+                details += `  Pipework: ${config.separator_details.pipework_diameter || 'N/A'}\n`;
+                details += `  Size Class: ${config.separator_details.space_available || 'N/A'}\n`;
+                details += `  Targets: ${(config.separator_details.target_contaminants || []).join(', ')}\n`;
+            }
+            details += `  Adoptable: ${config.adoptable_status || 'N/A'}\n`;
+            if (config.quote_details) {
+                 details += `  Estimated Cost Price: £${config.quote_details.cost_price?.toFixed(2) || 'N/A'}\n`;
+                 details += `  Estimated Sell Price (inc. ${config.quote_details.profit_markup_percent || 0}% markup): £${config.quote_details.estimated_sell_price?.toFixed(2) || 'N/A'}\n`;
+            }
+            return details;
+        }).join('\n-------------------------------------\n');
 
-        // **VERY IMPORTANT: Refine this prompt extensively!**
-        const prompt = `
-            You are an assistant for SuDS Enviro, a company specializing in sustainable drainage solutions.
-            Based on the following list of configured SuDS products, generate a concise project proposal document.
-            The proposal should be professional, clearly list the products, and provide a brief overview of a potential drainage scheme.
-            Assume these products are for a single project.
-            Start with a suitable project title and introduction. List each product with its code. Conclude with a next steps section.
+        const systemPrompt = `You are a highly proficient technical sales assistant for SuDS Enviro, a leading UK provider of Sustainable Drainage Systems. Your task is to generate a structured, professional, and persuasive project proposal based on a list of customer-configured SuDS products.
 
-            Configured Products:
-            - ${configurationsSummary}
+The proposal should include:
+1.  **Project Title:** Create a suitable and professional title (e.g., "Proposed Sustainable Drainage System for [Generic Project Name/Location]").
+2.  **Introduction:** Briefly introduce SuDS Enviro and the purpose of the proposal.
+3.  **Proposed SuDS Components:**
+    *   List each configured product clearly.
+    *   For each product, state its Derived Name, Product Code, and key technical specifications as provided.
+    *   Mention the estimated sell price for each component if available.
+4.  **System Overview (Conceptual):** Briefly describe how these components might work together in a typical SuDS scheme (e.g., "The proposed system is designed to effectively manage surface water runoff by capturing pollutants with catchpits and hydrodynamic separators, controlling flow rates with orifice chambers, and providing inspection access via universal chambers...").
+5.  **Benefits:** Briefly highlight 2-3 key benefits of using SuDS Enviro solutions (e.g., regulatory compliance, environmental protection, long-term cost-effectiveness).
+6.  **Next Steps:** Suggest next steps (e.g., site visit, detailed design consultation, formal quotation).
+7.  **Contact Information:**
+    SuDS Enviro
+    Email: sales@sudsenviro.co.uk
+    Phone: 01234 567890 (Replace with actual if different)
+    Website: www.sudsenviro.co.uk (Replace with actual if different)
 
-            Format the output as a professional proposal.
-        `;
+Maintain a professional and confident tone. Use clear, concise language.
+Format the output using Markdown for readability (headings, lists, bolding). Do not include the "Estimated Cost Price" in the client-facing proposal, only the "Estimated Sell Price".`;
+
+        const userQuery = `Please generate a project proposal based on the following configured SuDS components for a new project:
+
+${configurationsDetails}
+
+Ensure all specified sections are included and the formatting is professional.
+The total estimated sell price for all listed components is £${configs.reduce((sum, conf) => sum + (conf.quote_details?.estimated_sell_price || 0), 0).toFixed(2)}. Mention this total project estimate.`;
+
+
+        const aiApiEndpoint = 'https://api.openai.com/v1/chat/completions';
+        // If using Azure OpenAI, your endpoint will look different, e.g.:
+        // const aiApiEndpoint = `https://YOUR_AZURE_OPENAI_RESOURCE.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT_NAME/chat/completions?api-version=2023-07-01-preview`;
+
 
         try {
-            // Replace with your actual AI API endpoint and request structure
-            const response = await fetch('YOUR_AI_API_ENDPOINT', { // <<<<<<< REPLACE THIS
+            const requestBody = {
+                model: "gpt-4o", // Or "gpt-3.5-turbo", "gpt-4-turbo" etc. Consider gpt-4o for better quality.
+                messages: [
+                    { "role": "system", "content": systemPrompt },
+                    { "role": "user", "content": userQuery }
+                ],
+                max_tokens: 3000, // Increased for potentially longer proposals
+                temperature: 0.6  // A balance between creativity and factualness
+            };
+
+            const response = await fetch(aiApiEndpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}` // Common for many APIs
+                    'Authorization': `Bearer ${apiKey}`
                 },
-                body: JSON.stringify({
-                    // This structure depends HEAVILY on your AI API (e.g., OpenAI uses 'model' and 'messages' array)
-                    prompt: prompt,
-                    max_tokens: 1500, // Adjust as needed
-                    temperature: 0.7 // Adjust for creativity vs. determinism
-                })
+                body: JSON.stringify(requestBody)
             });
 
             if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error(`API request failed with status ${response.status}: ${errorData}`);
+                const errorData = await response.json().catch(() => ({ error: { message: "Failed to parse API error response." } }));
+                console.error("API Error Response:", errorData);
+                throw new Error(`API request failed with status ${response.status}: ${errorData.error?.message || response.statusText || "Unknown API error"}`);
             }
 
             const data = await response.json();
             
-            // Extract the generated text. This also depends on your AI API's response structure.
-            // For OpenAI, it might be data.choices[0].text or data.choices[0].message.content
-            const proposalText = data.generated_proposal || data.choices?.[0]?.text || data.choices?.[0]?.message?.content || "Could not extract proposal text from API response.";
+            const proposalText = data.choices?.[0]?.message?.content || "Could not extract proposal text from API response.";
             
             proposalOutputDiv.textContent = proposalText;
+            // If you want to render Markdown as HTML (requires including a Markdown library like 'marked.js')
+            // if (typeof marked !== 'undefined') {
+            //     proposalOutputDiv.innerHTML = marked.parse(proposalText);
+            // } else {
+            //     proposalOutputDiv.textContent = proposalText; // Fallback to plain text
+            // }
             proposalStatusDiv.textContent = 'Proposal generated successfully!';
 
         } catch (error) {
             console.error('Error generating proposal:', error);
-            proposalOutputDiv.textContent = `Error: ${error.message}`;
+            proposalOutputDiv.textContent = `Error generating proposal. Please check the console for details. Message: ${error.message}`;
             proposalStatusDiv.textContent = 'Proposal generation failed.';
         } finally {
             generateProposalButton.disabled = false;

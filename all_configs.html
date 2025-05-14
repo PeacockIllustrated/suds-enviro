@@ -4,317 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SuDS Enviro - Saved Configurations & Proposal</title>
-    <link rel="stylesheet" href="css/style.css"> <!-- Your shared styles -->
-    <style>
-        body {
-            padding-top: 80px; /* Default for desktop */
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--suds-bg-light); 
-            color: var(--suds-text-dark);
-        }
-        .container {
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: var(--suds-blue);
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        #config-list {
-            list-style: none;
-            padding: 0;
-        }
-        .config-item {
-            background-color: var(--suds-bg-light);
-            border: 1px solid var(--suds-border-light);
-            border-left: 5px solid var(--suds-green);
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap; 
-        }
-        .config-item-details {
-            flex-grow: 1;
-            margin-right: 10px; 
-            min-width: 200px; 
-        }
-        .config-item strong {
-            color: var(--suds-text-heading);
-            font-size: 1.1em;
-            display: block; 
-            margin-bottom: 3px;
-        }
-        .config-item p {
-            margin: 3px 0;
-            font-size: 0.9em;
-            color: var(--suds-text-dark);
-        }
-        .config-item .timestamp {
-            font-size: 0.8em;
-            color: #777;
-        }
-        .config-item-actions {
-            display: flex; 
-            flex-shrink: 0; 
-            margin-top: 5px; 
-        }
-        .config-item-actions button {
-            background-color: var(--suds-red);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            font-family: 'Montserrat', sans-serif; 
-            font-weight: 500;
-            transition: background-color 0.2s;
-            margin-left: 10px; 
-        }
-        .config-item-actions button:first-child {
-            margin-left: 0; 
-        }
-        .config-item-actions button:hover {
-            background-color: #a53c3a;
-        }
-        .config-item-actions button.view-details-btn {
-            background-color: var(--suds-blue);
-        }
-        .config-item-actions button.view-details-btn:hover {
-            background-color: #16699b;
-        }
-        .config-item pre {
-            background-color: #e9ecef;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            white-space: pre-wrap;
-            word-break: break-all;
-            margin-top: 10px;
-            display: none; 
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
-        .action-buttons-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .action-buttons-container button { 
-            display: inline-block; 
-            margin: 5px; 
-            padding: 12px 25px;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 1em;
-            cursor: pointer;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-        .action-buttons-container button:hover {
-            transform: translateY(-1px);
-        }
-
-        #export-configs-btn { background-color: var(--suds-blue); }
-        #export-configs-btn:hover { background-color: #16699b; }
-        #clear-all-configs-btn { background-color: var(--suds-red); }
-        #clear-all-configs-btn:hover { background-color: #a53c3a;}
-
-        .proposal-section {
-            margin-top: 30px;
-            padding: 20px;
-            border: 1px solid var(--suds-border-light);
-            border-radius: 8px;
-            background-color: var(--suds-bg-light);
-        }
-        .proposal-section h2 {
-            color: var(--suds-text-heading);
-            margin-top: 0;
-            border-bottom: 1px solid var(--suds-blue);
-            padding-bottom: 10px;
-            font-size: 1.6em; 
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        /* Styling for new input fields */
-        .proposal-input-group {
-            margin-bottom: 15px;
-        }
-        .proposal-input-group label {
-            display: block;
-            font-weight: 600;
-            color: var(--suds-text-dark);
-            margin-bottom: 6px;
-            font-size: 0.95em;
-        }
-        .proposal-input-group input[type="text"],
-        .proposal-input-group textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--suds-border-light);
-            border-radius: 20px; 
-            font-size: 0.95em;   
-            font-family: 'Montserrat', sans-serif;
-            box-sizing: border-box;
-            background-color: #fff; /* Ensure white background */
-        }
-        .proposal-input-group textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-
-        .api-key-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px; 
-        }
-        #api-key-input {
-            flex-grow: 1; 
-            padding: 10px 12px;
-            border: 1px solid var(--suds-border-light);
-            border-radius: 20px; 
-            font-size: 0.95em;   
-            font-family: 'Montserrat', sans-serif;
-            margin-right: 10px; 
-            box-sizing: border-box;
-        }
-        #save-api-key-btn {
-            padding: 10px 20px; 
-            background-color: var(--suds-blue); 
-            color:white; 
-            border:none; 
-            border-radius:20px; 
-            cursor:pointer;
-            font-size: 0.95em; 
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            transition: background-color 0.2s, transform 0.2s;
-            flex-shrink: 0; 
-        }
-        #save-api-key-btn:hover {
-            background-color: #16699b;
-            transform: translateY(-1px);
-        }
-
-        #generate-proposal-btn { 
-            background-color: var(--suds-green);
-        }
-        #generate-proposal-btn:hover {
-            background-color: #4a9d45;
-        }
-        #download-proposal-btn { 
-            background-color: var(--suds-text-dark); 
-            margin-left: 10px; 
-        }
-        #download-proposal-btn:hover {
-            background-color: #555;
-        }
-
-        #proposal-output {
-            margin-top: 20px;
-            padding: 15px 20px; 
-            background-color: #fff;
-            border: 1px solid var(--suds-border-light);
-            border-radius: 5px;
-            min-height: 200px; 
-            font-size: 0.9em; 
-            line-height: 1.6; 
-            overflow-x: auto; 
-        }
-        #proposal-output h1, #proposal-output h2, #proposal-output h3, #proposal-output h4 {
-            color: var(--suds-blue); 
-            font-family: 'Montserrat', sans-serif;
-        }
-        #proposal-output h1 { font-size: 1.8em; margin-bottom: 0.8em; margin-top: 0.5em; border-bottom: 2px solid var(--suds-blue); padding-bottom: 0.3em;}
-        #proposal-output h2 { font-size: 1.5em; margin-top: 1.2em; margin-bottom: 0.6em; border-bottom: 1px solid var(--suds-border-light); padding-bottom: 0.2em;}
-        #proposal-output h3 { font-size: 1.2em; margin-top: 1em; margin-bottom: 0.4em; color: var(--suds-text-heading); }
-        #proposal-output p { margin-bottom: 0.8em; }
-        #proposal-output ul, #proposal-output ol { margin-left: 25px; margin-bottom: 0.8em; padding-left: 0;}
-        #proposal-output li { margin-bottom: 0.4em; }
-        #proposal-output hr { border: none; border-top: 1px solid var(--suds-border-light); margin: 1.5em 0; }
-        #proposal-output strong, #proposal-output b { font-weight: 600; }
-        #proposal-output em, #proposal-output i { font-style: italic; }
-        #proposal-output blockquote {
-            border-left: 3px solid var(--suds-medium-grey); padding-left: 10px; margin-left: 0; color: #555; font-style: italic;
-        }
-        #proposal-output code { 
-            background-color: #f0f0f0; padding: 0.2em 0.4em; border-radius: 3px; font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-        }
-        #proposal-output pre { 
-            background-color: #f0f0f0; padding: 10px; border-radius: 4px; overflow-x: auto; font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-        }
-        #proposal-output pre code { padding: 0; background-color: transparent; border-radius: 0; }
-
-        #proposal-status {
-            margin-top: 15px; 
-            font-style: italic;
-            color: var(--suds-text-dark);
-            text-align: center;
-            font-weight: 500; 
-        }
-
-         @media (max-width: 768px) {
-            body { padding-top: 110px; } 
-            .container { padding: 15px; }
-            .config-item { 
-                flex-direction: column; 
-                align-items: flex-start;
-            }
-            .config-item-actions { 
-                margin-top: 10px; 
-                width: 100%; 
-                display: flex; 
-            }
-            .config-item-actions button { 
-                flex-grow: 1; 
-                margin-left: 0; 
-                margin-right: 5px;
-            }
-            .config-item-actions button:last-child { 
-                margin-right: 0;
-            }
-            .action-buttons-container button { 
-                display: block; 
-                width: calc(100% - 10px); 
-                margin: 10px auto; 
-            }
-            .api-key-group {
-                flex-direction: column;
-                align-items: stretch; 
-            }
-            #api-key-input {
-                margin-right: 0;
-                margin-bottom: 10px; 
-            }
-            #save-api-key-btn {
-                width: 100%; 
-            }
-            .proposal-section h2 {
-                font-size: 1.4em;
-            }
-            #generate-proposal-btn, #download-proposal-btn {
-                display: block;
-                width: calc(100% - 10px); 
-                margin-left: auto;
-                margin-right: auto;
-            }
-            #download-proposal-btn {
-                 margin-top: 10px; 
-            }
-        }
-    </style>
+    <!-- Link to the updated shared CSS file -->
+    <link rel="stylesheet" href="css/style.css"> 
 </head>
 <body>
     <nav class="navbar">
@@ -335,7 +26,7 @@
             <button id="clear-all-configs-btn">Clear All Saved Configurations</button>
         </div>
         <ul id="config-list">
-            <p style="text-align: center; color: #666; margin: 20px 0;">Loading configurations or no configurations saved yet...</p>
+            <p>Loading configurations or no configurations saved yet...</p>
         </ul>
 
         <div class="proposal-section">
@@ -356,10 +47,10 @@
                 <textarea id="project-notes" placeholder="e.g., High clay content on site, strict discharge limits, focus on biodiversity net gain..."></textarea>
             </div>
 
-            <hr style="margin: 25px 0;">
+            <hr style="margin: 25px 0;"> <!-- Simple separator, could be styled further if needed -->
 
             <div class="suds-form-group"> 
-                <label for="api-key-input" class="suds-label" style="color: var(--suds-text-dark); font-weight: 600; margin-bottom: 8px;">AI API Key (e.g., OpenAI):</label>
+                <label for="api-key-input">AI API Key (e.g., OpenAI):</label> <!-- Removed suds-label for consistency with .proposal-input-group label -->
                 <div class="api-key-group">
                     <input type="password" id="api-key-input" placeholder="Enter your AI API Key here">
                     <button id="save-api-key-btn">Save Key</button> 
@@ -379,6 +70,6 @@
 
     <!-- Include marked.js library for Markdown to HTML conversion -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="js/all_configs.js"></script>
+    <script src="js/all_configs.js"></script> <!-- Your JavaScript file -->
 </body>
 </html>

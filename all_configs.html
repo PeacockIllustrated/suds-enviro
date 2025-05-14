@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SuDS Enviro - Saved Configurations & Proposal</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css"> <!-- Your shared styles -->
     <style>
         body {
-            padding-top: 80px; /* Default for desktop */
+            padding-top: 80px; /* Default for desktop, adjust if navbar height changes */
             font-family: 'Montserrat', sans-serif;
             background-color: var(--suds-bg-light); 
             color: var(--suds-text-dark);
@@ -39,11 +39,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
+            flex-wrap: wrap; /* Allow actions to wrap on smaller screens */
         }
         .config-item-details {
             flex-grow: 1;
             margin-right: 10px; 
+            min-width: 200px; /* Ensure details don't get too squished */
         }
         .config-item strong {
             color: var(--suds-text-heading);
@@ -63,6 +64,7 @@
         .config-item-actions {
             display: flex; 
             flex-shrink: 0; 
+            margin-top: 5px; /* Add some margin if actions wrap */
         }
         .config-item-actions button {
             background-color: var(--suds-red);
@@ -72,6 +74,8 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 0.9em;
+            font-family: 'Montserrat', sans-serif; /* Consistent font */
+            font-weight: 500;
             transition: background-color 0.2s;
             margin-left: 10px; 
         }
@@ -140,12 +144,12 @@
             padding-bottom: 10px;
             font-size: 1.6em; 
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px; /* More space below heading */
         }
         .api-key-group {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px; /* More space below API key group */
         }
         #api-key-input {
             flex-grow: 1; 
@@ -168,6 +172,7 @@
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
             transition: background-color 0.2s, transform 0.2s;
+            flex-shrink: 0; /* Prevent button from shrinking */
         }
         #save-api-key-btn:hover {
             background-color: #16699b;
@@ -180,27 +185,62 @@
         #generate-proposal-btn:hover {
             background-color: #4a9d45;
         }
-        #download-markdown-btn { /* Changed from copy-markdown-btn */
+        #download-proposal-btn { 
             background-color: var(--suds-text-dark); 
             margin-left: 10px; 
         }
-        #download-markdown-btn:hover {
+        #download-proposal-btn:hover {
             background-color: #555;
         }
 
         #proposal-output {
             margin-top: 20px;
-            padding: 15px;
+            padding: 15px 20px; /* Slightly more padding */
             background-color: #fff;
             border: 1px solid var(--suds-border-light);
             border-radius: 5px;
-            white-space: pre-wrap; 
             min-height: 200px; 
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace; 
-            font-size: 0.9em;
-            line-height: 1.5; 
+            font-size: 0.9em; /* Using body font for rendered HTML */
+            line-height: 1.6; 
             overflow-x: auto; 
         }
+        /* Styles for HTML rendered from Markdown in the preview */
+        #proposal-output h1, #proposal-output h2, #proposal-output h3, #proposal-output h4 {
+            color: var(--suds-blue); 
+            font-family: 'Montserrat', sans-serif;
+        }
+        #proposal-output h1 { font-size: 1.8em; margin-bottom: 0.8em; margin-top: 0.5em; border-bottom: 2px solid var(--suds-blue); padding-bottom: 0.3em;}
+        #proposal-output h2 { font-size: 1.5em; margin-top: 1.2em; margin-bottom: 0.6em; border-bottom: 1px solid var(--suds-border-light); padding-bottom: 0.2em;}
+        #proposal-output h3 { font-size: 1.2em; margin-top: 1em; margin-bottom: 0.4em; color: var(--suds-text-heading); }
+        #proposal-output p { margin-bottom: 0.8em; }
+        #proposal-output ul, #proposal-output ol { margin-left: 25px; margin-bottom: 0.8em; padding-left: 0;} /* Adjusted list styling */
+        #proposal-output li { margin-bottom: 0.4em; }
+        #proposal-output hr { border: none; border-top: 1px solid var(--suds-border-light); margin: 1.5em 0; }
+        #proposal-output strong, #proposal-output b { font-weight: 600; }
+        #proposal-output em, #proposal-output i { font-style: italic; }
+        #proposal-output blockquote {
+            border-left: 3px solid var(--suds-medium-grey);
+            padding-left: 10px;
+            margin-left: 0;
+            color: #555;
+            font-style: italic;
+        }
+        #proposal-output code { /* For inline code if AI uses it */
+            background-color: #f0f0f0;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+        #proposal-output pre { /* For code blocks */
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+        #proposal-output pre code { padding: 0; background-color: transparent; border-radius: 0; }
+
+
         #proposal-status {
             margin-top: 15px; 
             font-style: italic;
@@ -211,6 +251,7 @@
 
          @media (max-width: 768px) {
             body { padding-top: 110px; } 
+            .container { padding: 15px; }
             .config-item { 
                 flex-direction: column; 
                 align-items: flex-start;
@@ -230,6 +271,7 @@
             }
             .action-buttons-container button { 
                 display: block; 
+                width: calc(100% - 10px); /* Account for margin */
                 margin: 10px auto; 
             }
             .api-key-group {
@@ -246,15 +288,14 @@
             .proposal-section h2 {
                 font-size: 1.4em;
             }
-            /* Ensure proposal action buttons stack on mobile */
-            #generate-proposal-btn, #download-markdown-btn {
+            #generate-proposal-btn, #download-proposal-btn {
                 display: block;
-                width: calc(100% - 10px); /* Account for margin */
+                width: calc(100% - 10px); 
                 margin-left: auto;
                 margin-right: auto;
             }
-            #download-markdown-btn {
-                 margin-top: 10px; /* Add space between them when stacked */
+            #download-proposal-btn {
+                 margin-top: 10px; 
             }
         }
     </style>
@@ -292,7 +333,7 @@
             </div>
             <div class="action-buttons-container">
                 <button id="generate-proposal-btn">Generate Proposal from All Saved Configurations</button>
-                <button id="download-markdown-btn" style="display: none;">Download Proposal (.md)</button> 
+                <button id="download-proposal-btn" style="display: none;">Download Proposal (.html)</button> 
             </div>
             <div id="proposal-status"></div>
             <div id="proposal-output">
@@ -301,6 +342,8 @@
         </div>
     </div>
 
+    <!-- Include marked.js library for Markdown to HTML conversion -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="js/all_configs.js"></script>
 </body>
 </html>

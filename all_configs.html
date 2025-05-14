@@ -4,23 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SuDS Enviro - Saved Configurations & Proposal</title>
-    <!-- Link to the updated shared CSS file -->
     <link rel="stylesheet" href="css/style.css"> 
 </head>
 <body>
     <nav class="navbar">
-        <div class="nav-logo">
-            <img src="https://uploads-ssl.webflow.com/6662e401ea62d861a416088f/6662e78d9725ab79209f1b60_Primary%20Logo%20-%20Colour.svg" alt="SuDS Enviro Logo">
-        </div>
+        <a href="index.html" class="nav-logo"> <!-- Make logo a link to home -->
+            <img src="assets/images/logo_horizontal.svg" alt="SuDS Enviro Logo"> <!-- USE YOUR HORIZONTAL LOGO -->
+        </a>
         <ul class="nav-links">
             <li><a href="index.html">Tools Hub</a></li>
             <li><a href="planner.html">Drainage Planner</a></li>
             <li><a href="all_configs.html" class="active">Saved Configurations</a></li>
+            <!-- Add links to other configurator pages here -->
+            <li><a href="catchpit.html">Catchpit Config</a></li>
+            <li><a href="orifice.html">Orifice Config</a></li>
+            <li><a href="universal_chamber.html">Chamber Config</a></li>
+            <li><a href="separator.html">Separator Config</a></li>
         </ul>
     </nav>
 
     <div class="container">
-        <h1>Saved Product Configurations</h1>
+        <div class="page-header-container">
+            <img src="assets/images/logo_main_final.svg" alt="SuDS Enviro Main Logo" class="page-logo-main">
+            <h1>Saved Product Configurations</h1>
+        </div>
+
         <div class="action-buttons-container">
             <button id="export-configs-btn">Export All Configurations (JSON)</button>
             <button id="clear-all-configs-btn">Clear All Saved Configurations</button>
@@ -39,18 +47,18 @@
 
             <div class="proposal-input-group">
                 <label for="project-name">Project Name / Location:</label>
-                <input type="text" id="project-name" placeholder="e.g., New Retail Park, Anytown or Site at Example Road">
+                <input type="text" id="project-name" placeholder="e.g., New Retail Park, Anytown">
             </div>
             
             <div class="proposal-input-group">
                 <label for="project-notes">Specific Project Notes (Optional - for AI context):</label>
-                <textarea id="project-notes" placeholder="e.g., High clay content on site, strict discharge limits, focus on biodiversity net gain..."></textarea>
+                <textarea id="project-notes" placeholder="e.g., High clay content on site, strict discharge limits..."></textarea>
             </div>
 
-            <hr style="margin: 25px 0;"> <!-- Simple separator, could be styled further if needed -->
+            <hr style="margin: 25px 0;">
 
             <div class="suds-form-group"> 
-                <label for="api-key-input">AI API Key (e.g., OpenAI):</label> <!-- Removed suds-label for consistency with .proposal-input-group label -->
+                <label for="api-key-input">AI API Key (e.g., OpenAI):</label>
                 <div class="api-key-group">
                     <input type="password" id="api-key-input" placeholder="Enter your AI API Key here">
                     <button id="save-api-key-btn">Save Key</button> 
@@ -68,8 +76,7 @@
         </div>
     </div>
 
-    <!-- Include marked.js library for Markdown to HTML conversion -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="js/all_configs.js"></script> <!-- Your JavaScript file -->
+    <script src="js/all_configs.js"></script> 
 </body>
 </html>

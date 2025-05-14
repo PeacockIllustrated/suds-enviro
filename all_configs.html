@@ -9,7 +9,7 @@
         body {
             padding-top: 80px; /* Default for desktop */
             font-family: 'Montserrat', sans-serif;
-            background-color: var(--suds-bg-light); /* Ensure body background matches theme */
+            background-color: var(--suds-bg-light); 
             color: var(--suds-text-dark);
         }
         .container {
@@ -61,8 +61,8 @@
             color: #777;
         }
         .config-item-actions {
-            display: flex; /* Align buttons in a row */
-            flex-shrink: 0; /* Prevent actions from shrinking too much */
+            display: flex; 
+            flex-shrink: 0; 
         }
         .config-item-actions button {
             background-color: var(--suds-red);
@@ -104,7 +104,7 @@
             text-align: center;
             margin-bottom: 20px;
         }
-        .action-buttons-container button { /* General style for buttons in this container */
+        .action-buttons-container button { 
             display: inline-block; 
             margin: 5px; 
             padding: 12px 25px;
@@ -138,7 +138,7 @@
             margin-top: 0;
             border-bottom: 1px solid var(--suds-blue);
             padding-bottom: 10px;
-            font-size: 1.6em; /* Slightly larger heading for this section */
+            font-size: 1.6em; 
             text-align: center;
             margin-bottom: 20px;
         }
@@ -151,8 +151,8 @@
             flex-grow: 1; 
             padding: 10px 12px;
             border: 1px solid var(--suds-border-light);
-            border-radius: 20px; /* Match other inputs */
-            font-size: 0.95em;   /* Match other inputs */
+            border-radius: 20px; 
+            font-size: 0.95em;   
             font-family: 'Montserrat', sans-serif;
             margin-right: 10px; 
             box-sizing: border-box;
@@ -162,9 +162,9 @@
             background-color: var(--suds-blue); 
             color:white; 
             border:none; 
-            border-radius:20px; /* Match other buttons */
+            border-radius:20px; 
             cursor:pointer;
-            font-size: 0.95em; /* Match other buttons */
+            font-size: 0.95em; 
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
             transition: background-color 0.2s, transform 0.2s;
@@ -174,18 +174,17 @@
             transform: translateY(-1px);
         }
 
-        /* Specific styling for generate and copy proposal buttons */
         #generate-proposal-btn { 
             background-color: var(--suds-green);
         }
         #generate-proposal-btn:hover {
             background-color: #4a9d45;
         }
-        #copy-markdown-btn {
+        #download-markdown-btn { /* Changed from copy-markdown-btn */
             background-color: var(--suds-text-dark); 
             margin-left: 10px; 
         }
-        #copy-markdown-btn:hover {
+        #download-markdown-btn:hover {
             background-color: #555;
         }
 
@@ -196,20 +195,19 @@
             border: 1px solid var(--suds-border-light);
             border-radius: 5px;
             white-space: pre-wrap; 
-            min-height: 200px; /* Increased height */
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace; /* Common monospaced fonts */
+            min-height: 200px; 
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace; 
             font-size: 0.9em;
-            line-height: 1.5; /* Improved readability */
-            overflow-x: auto; /* Allow horizontal scroll if content is too wide */
+            line-height: 1.5; 
+            overflow-x: auto; 
         }
         #proposal-status {
-            margin-top: 15px; /* Increased margin */
+            margin-top: 15px; 
             font-style: italic;
             color: var(--suds-text-dark);
             text-align: center;
-            font-weight: 500; /* Slightly bolder */
+            font-weight: 500; 
         }
-
 
          @media (max-width: 768px) {
             body { padding-top: 110px; } 
@@ -243,10 +241,20 @@
                 margin-bottom: 10px; 
             }
             #save-api-key-btn {
-                width: 100%; /* Full width on mobile */
+                width: 100%; 
             }
             .proposal-section h2 {
                 font-size: 1.4em;
+            }
+            /* Ensure proposal action buttons stack on mobile */
+            #generate-proposal-btn, #download-markdown-btn {
+                display: block;
+                width: calc(100% - 10px); /* Account for margin */
+                margin-left: auto;
+                margin-right: auto;
+            }
+            #download-markdown-btn {
+                 margin-top: 10px; /* Add space between them when stacked */
             }
         }
     </style>
@@ -284,7 +292,7 @@
             </div>
             <div class="action-buttons-container">
                 <button id="generate-proposal-btn">Generate Proposal from All Saved Configurations</button>
-                <button id="copy-markdown-btn" style="display: none;">Copy Proposal Markdown</button> 
+                <button id="download-markdown-btn" style="display: none;">Download Proposal (.md)</button> 
             </div>
             <div id="proposal-status"></div>
             <div id="proposal-output">
@@ -294,8 +302,5 @@
     </div>
 
     <script src="js/all_configs.js"></script>
-    <!-- Optional: If you want to try client-side Markdown to HTML rendering for display in the proposalOutputDiv -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> 
-   
 </body>
 </html>

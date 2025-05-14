@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SudsEnviro - Universal Chamber Configurator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css"> <!-- Shared CSS -->
+    <style>
+        /* --- Copied CSS from original Universal Chamber form --- */
+        :root {
+            --suds-blue: #1d80b9; --suds-green: #54b54d; --suds-red: #c34c4a;
+            --suds-text-dark: #333; --suds-text-heading: var(--suds-blue);
+            --suds-text-label-green: var(--suds-green); --suds-border-light: #d1d5db;
+            --suds-bg-light: #f9fafb; --suds-bg-conditional: #eef7ff;
+            --suds-select-bg: #e0e8f0; --suds-select-arrow: var(--suds-blue);
+            --hotspot-size: 32px;
+            --hotspot-inactive-bg: rgba(195, 76, 74, 0.2);
+            --hotspot-inactive-border: rgba(195, 76, 74, 0.4);
+            --hotspot-inactive-hover-bg: rgba(195, 76, 74, 0.4);
+            --hotspot-inactive-hover-border: var(--suds-red);
+        }
+        body {
+            font-family: 'Montserrat', sans-serif; line-height: 1.6; margin: 0; padding: 20px;
+            background-color: #f0f2f5; color: var(--suds-text-dark);
+            padding-top: 80px; /* Ensure content below navbar */
+        }
+        .suds-configurator-form {
+            max-width: 750px; margin: 20px auto; padding: 30px; background: #fff;
+            border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+        }
+        .suds-form-section {
+            border: 1px solid var(--suds-border-light); padding: 25px; margin-bottom: 30px;
+            border-radius: 6px; background-color: var(--suds-bg-light);
+        }
+        h2, h3 {
+            color: var(--suds-text-heading); font-weight: 700; margin-top: 0;
+            padding-bottom: 12px; border-bottom: 2px solid var(--suds-blue);
+            text-transform: uppercase;
+        }
+        h2 { font-size: 1.8em; margin-bottom: 25px; }
+        h3 { font-size: 1.4em; margin-bottom: 20px; margin-top: 30px; border-bottom-width: 1px; }
+        .suds-form-group { margin-bottom: 20px; }
+        .suds-label {
+            display: block; margin-bottom: 8px; font-weight: 600;
+            color: var(--suds-text-label-green); font-size: 0.95em;
+        }
+        .suds-input, .suds-select {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--suds-border-light);
+            border-radius: 20px; box-sizing: border-box; font-size: 0.95em;
+            color: var(--suds-text-dark); transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .suds-input { background-color: #fff; }
+        .suds-input[readonly] { background-color: #f3f4f6; cursor: not-allowed; }
+        .suds-select {
+            background-color: var(--suds-select-bg); appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            padding-right: 40px; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231d80b9%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat; background-position: right 15px center; background-size: 12px 12px; cursor: pointer;
+        }
+         .suds-select:disabled { background-color: #e5e7eb; cursor: not-allowed; opacity: 0.7; }
+        .suds-input:focus, .suds-select:focus { border-color: var(--suds-blue); outline: none; box-shadow: 0 0 0 3px rgba(29, 128, 185, 0.3); }
+        .suds-input::placeholder { color: #a0aec0; }
+        .suds-radio-group { display: flex; flex-wrap: wrap; gap: 25px; align-items: center; }
+        .suds-radio-group div { display: flex; align-items: center; }
+        .suds-radio-group label { font-weight: 500; color: var(--suds-text-dark); margin-left: 5px; cursor: pointer; }
+        .suds-radio-group input[type="radio"] { margin-right: 0; cursor: pointer; accent-color: var(--suds-blue); width: 1em; height: 1em; }
+        .suds-button { padding: 12px 20px; border: none; border-radius: 25px; cursor: pointer; font-size: 0.95em; font-weight: 600; text-align: center; transition: all 0.2s ease; letter-spacing: 0.5px; display: inline-block; }
+        .suds-button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .suds-submit-btn { background-color: var(--suds-blue); color: white; width: 100%; display: block; margin-top: 25px; font-size: 1em; font-weight: 700; padding: 14px 25px; }
+        .suds-submit-btn:hover { background-color: #186a9e; }
+        .inlet-remove-btn { background-color: var(--suds-red); color: white; float: right; margin-top: -8px; padding: 10px 18px; font-size: 0.9em; font-weight: 600; border-radius: 18px; }
+        .inlet-remove-btn:hover { background-color: #b03d3b; }
+        .apply-all-btn { background-color: var(--suds-blue); color: white; font-size: 0.8em; border-radius: 50%; width: 75px; height: 75px; padding: 0; margin-top: 15px; display: flex; align-items: center; justify-content: center; line-height: 1.2; text-align: center; margin-left: auto; margin-right: auto; border: none; cursor: pointer; transition: all 0.2s ease; }
+        .apply-all-btn:hover { background-color: #186a9e; transform: translateY(-1px) scale(1.05); }
+        #suds_product_code_display_container { margin-top: 25px; margin-bottom: 20px; padding: 15px; background-color: var(--suds-bg-conditional); border: 1px solid var(--suds-blue); border-radius: 8px; text-align: center; }
+        #suds_product_code_display_label { font-weight: 600; color: var(--suds-text-heading); display: block; margin-bottom: 5px; font-size: 0.9em; }
+        #suds_product_code_display { font-weight: 700; color: var(--suds-text-dark); font-size: 1.1em; word-break: break-all; }
+        #suds_submit_status { margin-top: 20px; font-weight: 500; text-align: center; padding: 12px; border-radius: 6px; }
+        .suds_status_success { background-color: #e8f5e9; color: var(--suds-green); border: 1px solid var(--suds-green); }
+        .suds_status_error { background-color: #ffebee; color: var(--suds-red); border: 1px solid var(--suds-red); }
+        .suds-error-message { color: var(--suds-red); font-size: 0.85em; margin-top: 6px; }
+
+        .ic-visual-selector-container{display:flex;flex-direction:column;align-items:center;margin-bottom:25px}
+        .ic-chamber-diagram{position:relative;width:250px;height:250px;margin:25px auto;border:2px solid transparent;background-size:contain;background-position:center center;background-repeat:no-repeat;transition:background-image .3s ease-in-out}
+        .ic-pipe-position{
+            position:absolute;
+            width:var(--hotspot-size);
+            height:var(--hotspot-size);
+            border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            box-shadow:0 1px 3px rgba(0,0,0,.1);
+            transition:background-color .2s,border-color .2s,transform .15s ease-out,opacity .3s ease-in-out,visibility .3s ease-in-out;
+            opacity:1;visibility:visible;
+        }
+        .ic-pipe-position.hidden-inlet{opacity:0;visibility:hidden;pointer-events:none}
+
+        .ic-pipe-position.ic-inlet{
+            cursor:pointer;
+            background-color: var(--hotspot-inactive-bg);
+            border: 2px solid var(--hotspot-inactive-border);
+        }
+        .ic-pipe-position.ic-inlet:hover{
+            background-color: var(--hotspot-inactive-hover-bg);
+            border-color: var(--hotspot-inactive-hover-border);
+            transform:scale(1.1)
+        }
+        .ic-pipe-position.ic-inlet.selected{
+            background-color:var(--suds-green);
+            border-color:#45a040;
+            transform:scale(1.1)
+        }
+        .ic-pipe-position.ic-inlet.selected::before {
+            content: ''; display: block; width: 65%; height: 65%;
+            background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M173.898%20439.404l-166.4-166.4c-9.997-9.997-9.997-26.206%200-36.204l36.203-36.204c9.997-9.998%2026.207-9.998%2036.204%200L192%20312.69%20432.095%2072.596c9.997-9.997%2026.207-9.997%2036.204%200l36.203%2036.204c9.997%209.997%209.997%2026.206%200%2036.204l-294.4%20294.401c-9.998%209.997-26.207%209.997-36.204-.001z%22%2F%3E%3C%2Fsvg%3E');
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+        }
+
+        .ic-pipe-position.ic-outlet{
+            background-color:var(--suds-red);
+            border-color:#b03d3b;
+            cursor:default;
+             color: white;
+        }
+        .ic-pipe-position.ic-outlet::after{
+             content:'➤';font-size:.75em;
+             transform:rotate(-90deg) translateX(1px);color:white;
+        }
+
+        .pos-1200-alt{top:-25px;left:calc(50% - var(--hotspot-size)/2)}
+        .pos-0300-alt{top:calc(50% - var(--hotspot-size)/2);right:-25px}
+        .pos-0600-alt{bottom:-25px;left:calc(50% - var(--hotspot-size)/2)}
+        .pos-0900-alt{top:calc(50% - var(--hotspot-size)/2);left:-25px}
+        .pos-0500-alt{top:199px;left:199px}
+        .pos-0700-alt{top:199px;left:19px}
+
+        #inlet_selector_error_container{text-align:center;margin-top:15px}#active_inlet_configs_container{margin-top:25px}
+        .inlet-config-block{border:1px solid var(--suds-blue);border-radius:8px;padding:20px;margin-bottom:25px;background-color:var(--suds-bg-conditional)}.inlet-config-block h4{margin-top:0;color:var(--suds-blue);font-size:1.2em;border-bottom:1px solid #cce4f3;padding-bottom:10px;font-weight:700}
+        .suds-conditional-options{padding:15px;border-left:4px solid var(--suds-blue);margin-top:15px;margin-bottom:15px;background-color:#fff;border-radius:6px;box-shadow:inset 2px 0 5px rgba(29,128,185,.05)}
+        #shopping_list_details{border:1px solid var(--suds-blue);border-radius:8px;margin-top:30px;background-color:#fdfdfe}#shopping_list_summary{font-weight:700;font-size:1.1em;padding:15px 20px;cursor:pointer;color:var(--suds-blue);display:block;list-style:none;position:relative}#shopping_list_summary::-webkit-details-marker{display:none}#shopping_list_summary::after{content:'▼';font-size:.8em;position:absolute;right:20px;top:50%;transform:translateY(-50%);transition:transform .2s ease-out}#shopping_list_details[open]>#shopping_list_summary::after{transform:translateY(-50%) rotate(180deg)}
+        #shopping_list_container{padding:0 20px 20px}
+        #shopping_list_items{list-style:none;padding:0;margin:0 0 15px;max-height:300px;overflow-y:auto;border-bottom:1px solid var(--suds-border-light);padding-bottom:15px}#shopping_list_items li{display:flex;justify-content:space-between;padding:8px 0;font-size:.9em;border-bottom:1px dashed #e5e7eb}#shopping_list_items li:last-child{border-bottom:none}#shopping_list_items .item-description{color:var(--suds-text-dark)}#shopping_list_items .item-cost{font-weight:600;color:var(--suds-green)}
+        .quote-calculation-area { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--suds-border-light); }
+        .markup-group { margin-bottom: 15px; max-width: 250px; }
+        .markup-group .suds-input { border-radius: 6px; }
+        .markup-group .suds-label { color: var(--suds-text-dark); font-weight: 500;}
+        #shopping_list_total, #shopping_list_sell_price { text-align: right; font-size: 1.1em; font-weight: 600; padding: 5px 0; }
+        #shopping_list_total span, #shopping_list_sell_price span { display: inline-block; }
+        #cost_price_label, #sell_price_label { color: var(--suds-text-heading); margin-right: 10px; font-weight: 700; }
+        #cost_price_value, #sell_price_value { color: var(--suds-green); font-weight: 700; min-width: 70px; }
+        #sell_price_value { color: var(--suds-blue); }
+        @media (max-width: 768px){h2{font-size:1.6em}h3{font-size:1.3em}.suds-configurator-form{padding:20px}.ic-chamber-diagram{width:220px;height:220px}
+            .ic-pipe-position { width: calc(var(--hotspot-size) - 2px); height: calc(var(--hotspot-size) - 2px); }
+            .pos-1200-alt{top:-23px;left:calc(50% - 15px)}
+            .pos-0300-alt{top:calc(50% - 15px);right:-23px}
+            .pos-0600-alt{bottom:-23px;left:calc(50% - 15px)}
+            .pos-0900-alt{top:calc(50% - 15px);left:-23px}
+            .pos-0500-alt { top: 175px; left: 175px; }
+            .pos-0700-alt { top: 175px; left: 15px; }
+            .inlet-remove-btn{float:none;display:block;width:100%;margin-top:10px;margin-bottom:5px}#shopping_list_summary::after{display:none}.markup-group {max-width: none;} body{padding-top: 110px;} }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="https://uploads-ssl.webflow.com/6662e401ea62d861a416088f/6662e78d9725ab79209f1b60_Primary%20Logo%20-%20Colour.svg" alt="SuDS Enviro Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Tools Hub</a></li>
+            <li><a href="planner.html">Drainage Planner</a></li>
+            <li><a href="catchpit.html">Catchpit Configurator</a></li>
+            <li><a href="orifice.html">Orifice Configurator</a></li>
+            <li><a href="universal_chamber.html" class="active">Universal Chamber</a></li>
+            <li><a href="separator.html">Separator Configurator</a></li>
+            <li><a href="all_configs.html">Saved Configurations</a></li>
+        </ul>
+    </nav>
+
+    <form id="sudsUniversalChamberForm" class="suds-configurator-form">
+        <div class="suds-form-section">
+            <h2>Universal Chamber Configuration</h2>
+            <div class="suds-form-group">
+                <label class="suds-label" for="chamber_system_type">Chamber System Type:</label>
+                <select class="suds-select" id="chamber_system_type" name="chamber_system_type" required>
+                    <option value="">-- Select System Type --</option>
+                    <option value="SIC_FIC">SIC / FIC (Standard 5-Inlet)</option>
+                    <option value="SERSIC_SERFIC">SERSIC / SERFIC (Separation 3-Inlet)</option>
+                </select>
+            </div>
+            <h3>Main Chamber Properties</h3>
+             <div class="suds-form-group">
+                <label class="suds-label">Adoptable Status:</label>
+                <div class="suds-radio-group" id="adoptable_status_group">
+                     <div> <input type="radio" id="adoptable_yes" name="adoptable_status" value="adoptable" required> <label for="adoptable_yes">Adoptable</label> </div>
+                     <div> <input type="radio" id="adoptable_no" name="adoptable_status" value="non_adoptable" required> <label for="adoptable_no">Non-Adoptable</label> </div>
+                </div>
+             </div>
+            <div class="suds-form-group">
+                <label class="suds-label" for="water_application_type">Water Application Type:</label>
+                <select class="suds-select" id="water_application_type" name="water_application_type" required>
+                    <option value="">-- Select Water Application --</option> <option value="Surface">Surface Water</option> <option value="Foul">Foul Water</option>
+                </select>
+            </div>
+            <div class="suds-form-group">
+                <label class="suds-label" for="ic_chamber_depth">Chamber depth (mm):</label>
+                <select class="suds-select" id="ic_chamber_depth" name="ic_chamber_depth" required disabled> <option value="">-- Select Adoptable Status First --</option> </select>
+            </div>
+            <div class="suds-form-group">
+                <label class="suds-label" for="ic_chamber_diameter">Chamber diameter:</label>
+                <select class="suds-select" id="ic_chamber_diameter" name="ic_chamber_diameter" required>
+                    <option value="">-- Select Diameter --</option> <option value="315mm">315mm</option> <option value="450mm">450mm</option> <option value="600mm">600mm</option> <option value="1050mm">1050mm</option>
+                </select>
+            </div>
+            <h3>Inlet Selection & Configuration</h3>
+            <div class="ic-visual-selector-container">
+                <label class="suds-label">Click on diagram to activate/deactivate inlets:</label>
+                <div class="ic-chamber-diagram" id="chamberDiagram">
+                    <div class="ic-pipe-position ic-outlet pos-1200-alt" title="Outlet (12:00 - Fixed)"></div>
+                    <div class="ic-pipe-position ic-inlet pos-0300-alt" data-position="3:00" title="Toggle Inlet 3:00"></div>
+                    <div class="ic-pipe-position ic-inlet pos-0500-alt" data-position="5:00" title="Toggle Inlet 5:00"></div>
+                    <div class="ic-pipe-position ic-inlet pos-0600-alt" data-position="6:00" title="Toggle Inlet 6:00"></div>
+                    <div class="ic-pipe-position ic-inlet pos-0700-alt" data-position="7:00" title="Toggle Inlet 7:00"></div>
+                    <div class="ic-pipe-position ic-inlet pos-0900-alt" data-position="9:00" title="Toggle Inlet 9:00"></div>
+                </div>
+                <div id="inlet_selector_error_container"> <div id="inlet_selector_error" class="suds-error-message"></div> </div>
+            </div>
+            <div id="active_inlet_configs_container"></div>
+        </div>
+        <div id="suds_product_code_display_container">
+            <span id="suds_product_code_display_label">Generated Product Code:</span>
+            <span id="suds_product_code_display">Please make selections...</span>
+        </div>
+        <details id="shopping_list_details">
+            <summary id="shopping_list_summary">Estimated Quote / Shopping List</summary>
+            <div id="shopping_list_container">
+                <ul id="shopping_list_items"> <li>Select options to see quote...</li> </ul>
+                <div class="quote-calculation-area">
+                    <div class="suds-form-group markup-group">
+                        <label class="suds-label" for="profit_markup_percent">Profit Markup (%):</label>
+                        <input type="number" id="profit_markup_percent" name="profit_markup_percent" class="suds-input" min="0" step="0.1" value="0" placeholder="e.g., 15.5">
+                    </div>
+                    <div id="shopping_list_total"> <span id="cost_price_label">Cost Price:</span> <span id="cost_price_value">£0.00</span> </div>
+                    <div id="shopping_list_sell_price"> <span id="sell_price_label">Sell Price (inc. Markup):</span> <span id="sell_price_value">£0.00</span> </div>
+                </div>
+            </div>
+        </details>
+        <button type="submit" class="suds-submit-btn">Submit Chamber Configuration</button>
+        <div id="suds_submit_status"></div>
+    </form>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Pricing Rules
+        const pricingRules = { base: 50.00, system_type: {'SIC_FIC': 0, 'SERSIC_SERFIC': 150.00}, water_application: {'Surface': 0, 'Foul': 25.00}, adoptable_status: {'adoptable': 50.00, 'non_adoptable': 0}, depth_base: 75.00, depth_per_150mm_step: 12.00, diameter: {'315mm': 0, '450mm': 40.00, '600mm': 90.00, '1050mm': 250.00}, outlet_base: 15.00, inlet_base: 20.00, pipe_size_multiplier: {'110mm': 1.0, '160mm': 1.3, '225mm': 1.8}, pipe_material_adder: {'PVC': 0, 'Clay': 10.00, 'Twinwall': 5.00, 'Other': 30.00} };
+
+        // DOM References
+        const form = document.getElementById('sudsUniversalChamberForm');
+        const submitStatus = document.getElementById('suds_submit_status');
+        const webhookUrl = 'https://mkiminstest.app.n8n.cloud/webhook-test/862c9207-f6dd-4ee7-ae40-4658d15de3d0';
+        const MAX_INLETS_SIC = 5; const MAX_INLETS_SERSIC = 3;
+        let currentMaxInlets = MAX_INLETS_SIC; let activeInletPositions = [];
+        const diagramInletElements = Array.from(document.querySelectorAll('.ic-chamber-diagram .ic-inlet'));
+        const inletSelectorErrorDiv = document.getElementById('inlet_selector_error');
+        const activeInletConfigsContainer = document.getElementById('active_inlet_configs_container');
+        const chamberDiagram = document.getElementById('chamberDiagram');
+        const productCodeDisplay = document.getElementById('suds_product_code_display');
+        const shoppingListItemsUl = document.getElementById('shopping_list_items');
+        const costPriceValueSpan = document.getElementById('cost_price_value');
+        const sellPriceValueSpan = document.getElementById('sell_price_value');
+        const profitMarkupInput = document.getElementById('profit_markup_percent');
+        const chamberSystemTypeSelect = document.getElementById('chamber_system_type');
+        const waterApplicationTypeSelect = document.getElementById('water_application_type');
+        const chamberDepthSelect = document.getElementById('ic_chamber_depth');
+        const chamberDiameterSelect = document.getElementById('ic_chamber_diameter');
+        const adoptableStatusGroup = document.getElementById('adoptable_status_group');
+        const imageUrlSicFic = 'https://cdn.prod.website-files.com/6662e401ea62d861a416088f/681cab9600a1d9280a8be059_Untitled-1.png';
+        const imageUrlSersicSerfic = 'https://cdn.prod.website-files.com/6662e401ea62d861a416088f/681cb9353f66a1ba5d64391c_Untitled-2.png';
+        const savedConfigStorageKey = 'sudsSavedConfigs'; // LocalStorage Key
+
+        // --- Helper Functions ---
+        function getProductName() { const s=chamberSystemTypeSelect.value;const w=waterApplicationTypeSelect.value;if(s==='SERSIC_SERFIC')return w==='Foul'?'SERFIC':'SERSIC';else if(s==='SIC_FIC')return w==='Foul'?'FIC':'SIC';return 'N/A';}
+        function formatInletPositionsForCode() { return activeInletPositions.map(p=>parseInt(p.split(':')[0])).sort((a,b)=>a-b).map(h=>String(h)).join('');}
+        function formatCurrency(value) { return `£${value.toFixed(2)}`; }
+        function populateDepthOptions() { const selectedAdoptable = document.querySelector('input[name="adoptable_status"]:checked'); const adoptableValue = selectedAdoptable?.value; const currentDepthValue = chamberDepthSelect.value; chamberDepthSelect.innerHTML = ''; if (!adoptableValue) { chamberDepthSelect.disabled = true; const o=document.createElement('option');o.value="";o.textContent="-- Select Adoptable Status First --";chamberDepthSelect.appendChild(o);updateProductCodeDisplay();updateQuoteDisplay();return; } chamberDepthSelect.disabled = false; const dO=document.createElement('option');dO.value="";dO.textContent="-- Select Depth --";chamberDepthSelect.appendChild(dO); const minD=600; const maxD=(adoptableValue==='adoptable')?3000:6000; const inc=150; for (let d=minD; d<=maxD; d+=inc) { const o=document.createElement('option');o.value=d;o.textContent=`${d}mm`;chamberDepthSelect.appendChild(o); } if (currentDepthValue&&chamberDepthSelect.querySelector(`option[value="${currentDepthValue}"]`)){chamberDepthSelect.value=currentDepthValue;} else {chamberDepthSelect.value="";} updateProductCodeDisplay();updateQuoteDisplay(); }
+
+        function calculateQuote() { let totalCost = 0; const items = []; const formData = new FormData(form); totalCost += pricingRules.base; items.push({ description: "Base Chamber", cost: pricingRules.base }); const systemType = formData.get('chamber_system_type'); if (systemType && pricingRules.system_type[systemType]) { const c=pricingRules.system_type[systemType]; if(c>0)items.push({description:`System: ${systemType.replace('_',' / ')}`,cost:c}); totalCost+=c; } const waterApp = formData.get('water_application_type'); if (waterApp && pricingRules.water_application[waterApp]) { const c=pricingRules.water_application[waterApp]; if(c>0)items.push({description:`Application: ${waterApp} Water`,cost:c}); totalCost+=c; } const adoptableStatus = formData.get('adoptable_status'); if (adoptableStatus && pricingRules.adoptable_status[adoptableStatus]) { const c=pricingRules.adoptable_status[adoptableStatus]; if(c>0)items.push({description:`Status: ${adoptableStatus.charAt(0).toUpperCase() + adoptableStatus.slice(1)}`, cost: c }); totalCost += c; } const depth = parseFloat(formData.get('ic_chamber_depth')); if (depth && depth >= 600) { let depthCost = pricingRules.depth_base; const steps = (depth - 600) / 150; depthCost += steps * pricingRules.depth_per_150mm_step; items.push({description:`Depth: ${depth}mm`,cost:depthCost}); totalCost+=depthCost; } const diameter = formData.get('ic_chamber_diameter'); if (diameter && pricingRules.diameter[diameter]) { const c=pricingRules.diameter[diameter]; if(c>0)items.push({description:`Diameter: ${diameter}`,cost:c}); totalCost+=c; } activeInletPositions.forEach(pos => { const s=pos.replace(":", ""); const is=form.querySelector(`#inlet_pipe_size_${s}`)?.value; const im=form.querySelector(`#inlet_pipe_material_${s}`)?.value; if(is||im){ let ic=pricingRules.inlet_base; let d=`Inlet (${pos})`; if(is&&pricingRules.pipe_size_multiplier[is]){ic*=pricingRules.pipe_size_multiplier[is];d+=` ${is}`;} if(im&&pricingRules.pipe_material_adder[im]){const mc=pricingRules.pipe_material_adder[im];ic+=mc;d+=` ${im}`;const oi=form.querySelector(`#inlet_pipe_material_other_${s}`);if(im==='Other'&&oi?.value){d+=` (${oi.value})`}} items.push({description:d,cost:ic}); totalCost+=ic; } }); return { total: totalCost, items: items }; }
+
+        function updateQuoteDisplay() { const quote=calculateQuote(); const costPrice=quote.total; const markupPercent=parseFloat(profitMarkupInput.value)||0; const sellPrice=costPrice*(1+markupPercent/100); shoppingListItemsUl.innerHTML=''; if(quote.items.length>0){quote.items.forEach(item=>{const li=document.createElement('li');li.innerHTML=`<span class="item-description">${item.description}</span><span class="item-cost">${formatCurrency(item.cost)}</span>`;shoppingListItemsUl.appendChild(li);});}else{shoppingListItemsUl.innerHTML='<li>Select options to see quote...</li>';} costPriceValueSpan.textContent=formatCurrency(costPrice); sellPriceValueSpan.textContent=formatCurrency(sellPrice); }
+        function updateProductCodeDisplay() { const name=getProductName(); const adoptableSelectedValue = document.querySelector('input[name="adoptable_status"]:checked')?.value; const depthValue = chamberDepthSelect.value; const diameterValue = chamberDiameterSelect.value; const inletsCode = formatInletPositionsForCode(); if(name==='N/A'||!adoptableSelectedValue||!depthValue||!diameterValue||inletsCode===''){productCodeDisplay.textContent='Please complete selections...';return;} const adoptableCode = adoptableSelectedValue === 'adoptable' ? 'AD' : 'NA'; const diameterCode = diameterValue.replace('mm',''); productCodeDisplay.textContent=`${name}-${depthValue}-${diameterCode}-${inletsCode}-${adoptableCode}`; }
+        function updateChamberSystemView(systemType) { const inletsToHideForSersic=['5:00','7:00']; chamberDiagram.style.backgroundImage=`url('${systemType==='SERSIC_SERFIC'?imageUrlSersicSerfic:imageUrlSicFic}')`; currentMaxInlets=systemType==='SERSIC_SERFIC'?MAX_INLETS_SERSIC:MAX_INLETS_SIC; diagramInletElements.forEach(el=>{const isSersicMode=systemType==='SERSIC_SERFIC';const shouldHide=isSersicMode&&inletsToHideForSersic.includes(el.dataset.position);el.classList.toggle('hidden-inlet',shouldHide);if(shouldHide&&el.classList.contains('selected')){setTimeout(()=>el.click(),0);}}); updateProductCodeDisplay(); updateQuoteDisplay(); }
+        function createInletConfigBlock(position) { const safePositionId = position.replace(":", ""); const block = document.createElement('div'); block.className = 'inlet-config-block'; block.id = `inlet_config_${safePositionId}`; block.innerHTML = `<h4>Inlet Configuration: ${position}<button type="button" class="inlet-remove-btn" data-position="${position}" title="Remove Inlet ${position}">Remove</button></h4><div class="suds-form-group"><label class="suds-label" for="inlet_pipe_size_${safePositionId}">Pipework Size:</label><select class="suds-select inlet-pipe-size" id="inlet_pipe_size_${safePositionId}" name="inlet_pipe_size_${safePositionId}" required><option value="">-- Select Size --</option><option value="110mm">110mm</option><option value="160mm">160mm</option><option value="225mm">225mm</option></select></div><div class="suds-form-group"><label class="suds-label" for="inlet_pipe_material_${safePositionId}">Pipe System Material:</label><select class="suds-select inlet-material-select" id="inlet_pipe_material_${safePositionId}" name="inlet_pipe_material_${safePositionId}" data-position="${position}" required><option value="">-- Select Material --</option><option value="PVC">PVC</option><option value="Clay">Clay</option><option value="Twinwall">Twinwall</option><option value="Other">Other</option></select></div><div id="inlet_pipe_material_other_container_${safePositionId}" class="suds-conditional-options" style="display:none;"><div class="suds-form-group"><label class="suds-label" for="inlet_pipe_material_other_${safePositionId}">Specify other material:</label><input class="suds-input inlet-other-material" type="text" id="inlet_pipe_material_other_${safePositionId}" name="inlet_pipe_material_other_${safePositionId}"></div></div><button type="button" class="suds-button apply-all-btn" data-position="${position}" title="Apply these Size/Material settings to all other active inlets">Apply All</button>`; activeInletConfigsContainer.appendChild(block); block.querySelector('.inlet-remove-btn').addEventListener('click', handleRemoveInletClick); const inletMaterialSelect = block.querySelector('.inlet-material-select'); inletMaterialSelect.addEventListener('change', handleInletMaterialChange); block.querySelectorAll('select, input').forEach(el => { el.addEventListener('change', updateQuoteAndCode); if (el.type === 'text' || el.type === 'number') { el.addEventListener('keyup', updateQuoteAndCode); el.addEventListener('input', updateQuoteAndCode); } }); block.querySelector('.apply-all-btn').addEventListener('click', handleApplyToAllClick); }
+        function validateInletSelection(isSilent = false) { const dbe=document.querySelector('.ic-chamber-diagram');if(activeInletPositions.length===0){if(!isSilent){inletSelectorErrorDiv.textContent='Please select and configure at least 1 inlet.';dbe.style.borderColor='var(--suds-red)';}return false;}inletSelectorErrorDiv.textContent='';dbe.style.borderColor='transparent';return true; }
+        function handleRemoveInletClick() { const diagramEl = document.querySelector(`.ic-inlet[data-position="${this.dataset.position}"]`); if (diagramEl) diagramEl.click(); }
+        function handleInletMaterialChange() { const safePosId=this.dataset.position.replace(':','');const otherContainer=document.getElementById(`inlet_pipe_material_other_container_${safePosId}`);const otherInput=document.getElementById(`inlet_pipe_material_other_${safePosId}`);otherContainer.style.display=this.value==='Other'?'block':'none';otherInput.required=this.value==='Other';if(this.value!=='Other')otherInput.value='';updateQuoteDisplay();}
+        function updateQuoteAndCode() { updateProductCodeDisplay(); updateQuoteDisplay(); }
+        function handleApplyToAllClick() { const sourcePosition = this.dataset.position; const sourceSafePosId = sourcePosition.replace(":", ""); const sourceSizeSelect = document.getElementById(`inlet_pipe_size_${sourceSafePosId}`); const sourceMaterialSelect = document.getElementById(`inlet_pipe_material_${sourceSafePosId}`); const sourceOtherInput = document.getElementById(`inlet_pipe_material_other_${sourceSafePosId}`); const sourceSize = sourceSizeSelect.value; const sourceMaterial = sourceMaterialSelect.value; const sourceOtherValue = sourceMaterial === 'Other' ? sourceOtherInput.value : ''; let confirmNeeded = false; activeInletPositions.forEach(pos => { if (pos === sourcePosition) return; const targetSafePosId = pos.replace(":", ""); const targetSize = document.getElementById(`inlet_pipe_size_${targetSafePosId}`)?.value; const targetMaterial = document.getElementById(`inlet_pipe_material_${targetSafePosId}`)?.value; if (targetSize || targetMaterial) { confirmNeeded = true; } }); let proceed = true; if (confirmNeeded) { proceed = confirm("Update all other active inlets with these settings? Existing selections will be overwritten."); } if (proceed) { activeInletPositions.forEach(pos => { if (pos === sourcePosition) return; const targetSafePosId = pos.replace(":", ""); const targetSizeSelect = document.getElementById(`inlet_pipe_size_${targetSafePosId}`); const targetMaterialSelect = document.getElementById(`inlet_pipe_material_${targetSafePosId}`); const targetOtherContainer = document.getElementById(`inlet_pipe_material_other_container_${targetSafePosId}`); const targetOtherInput = document.getElementById(`inlet_pipe_material_other_${targetSafePosId}`); if (targetSizeSelect) { targetSizeSelect.value = sourceSize; } if (targetMaterialSelect) { targetMaterialSelect.value = sourceMaterial; } if (targetOtherContainer) { targetOtherContainer.style.display = sourceMaterial === 'Other' ? 'block' : 'none'; } if (targetOtherInput) { targetOtherInput.value = sourceOtherValue; targetOtherInput.required = sourceMaterial === 'Other'; } if(targetSizeSelect) targetSizeSelect.dispatchEvent(new Event('change', { bubbles: true })); if(targetMaterialSelect) targetMaterialSelect.dispatchEvent(new Event('change', { bubbles: true })); }); updateQuoteDisplay(); updateProductCodeDisplay(); } }
+
+        const elementsTriggeringUpdates = [ chamberSystemTypeSelect, waterApplicationTypeSelect, chamberDepthSelect, chamberDiameterSelect, profitMarkupInput ];
+        elementsTriggeringUpdates.forEach(el => { el.addEventListener('change', updateQuoteAndCode); if (el.type === 'number' || el.type === 'text') { el.addEventListener('keyup', updateQuoteAndCode); el.addEventListener('input', updateQuoteAndCode); } });
+        adoptableStatusGroup.addEventListener('change', () => { populateDepthOptions(); });
+        chamberSystemTypeSelect.addEventListener('change', function() { updateChamberSystemView(this.value); });
+        diagramInletElements.forEach(inletEl => { inletEl.addEventListener('click', function() { if(this.classList.contains('hidden-inlet'))return; const p=this.dataset.position;inletSelectorErrorDiv.textContent=''; const e=document.getElementById(`inlet_config_${p.replace(":", "")}`); if(e){activeInletConfigsContainer.removeChild(e);activeInletPositions=activeInletPositions.filter(i=>i!==p);this.classList.remove('selected');}else{ let m=chamberSystemTypeSelect.value==='SERSIC_SERFIC'?MAX_INLETS_SERSIC:MAX_INLETS_SIC;if(activeInletPositions.length<m){activeInletPositions.push(p);this.classList.add('selected');createInletConfigBlock(p);}else{inletSelectorErrorDiv.textContent=`Maximum ${m} inlets can be selected for this configuration.`}} validateInletSelection(true);updateQuoteAndCode(); }); });
+
+        populateDepthOptions(); updateChamberSystemView(chamberSystemTypeSelect.value); updateProductCodeDisplay(); updateQuoteDisplay();
+
+        form.addEventListener('submit', function(event) {
+             event.preventDefault(); submitStatus.textContent = 'Submitting...'; submitStatus.className = ''; form.querySelectorAll('.suds-input, .suds-select').forEach(el => el.style.borderColor = ''); adoptableStatusGroup.style.outline = 'none'; document.querySelector('.ic-chamber-diagram').style.borderColor = 'transparent'; inletSelectorErrorDiv.textContent = ''; let isValid = true; const adoptableSelected = form.querySelector('input[name="adoptable_status"]:checked'); if (!adoptableSelected) { isValid = false; adoptableStatusGroup.style.outline = '2px solid var(--suds-red)'; } else { adoptableStatusGroup.style.outline = 'none'; }
+             const requiredStaticFields = form.querySelectorAll('#chamber_system_type[required], #water_application_type[required], #ic_chamber_depth[required], #ic_chamber_diameter[required]');
+             requiredStaticFields.forEach(input => { if ((input.tagName === 'SELECT' && input.value === "") || (input.tagName !== 'SELECT' && !input.value.trim())) { isValid = false; input.style.borderColor = 'var(--suds-red)'; } else { input.style.borderColor = ''; } });
+             activeInletPositions.forEach(pos => { const safePosId = pos.replace(":", ""); const configBlock = document.getElementById(`inlet_config_${safePosId}`); if (!configBlock) { isValid = false; return; } configBlock.querySelectorAll('[required]').forEach(input => { if ((input.tagName === 'SELECT' && input.value === "") || (input.tagName !== 'SELECT' && !input.value.trim())) { isValid = false; input.style.borderColor = 'var(--suds-red)'; } else { input.style.borderColor = ''; } }); });
+             if (!validateInletSelection(false)) isValid = false;
+             if (!isValid) { submitStatus.textContent = 'Please fill in all required fields and configure selected inlets.'; submitStatus.className = 'suds_status_error'; const firstInvalidField = form.querySelector('[style*="border-color: var(--suds-red)"], .ic-chamber-diagram[style*="border-color: var(--suds-red)"], [style*="outline"]'); if (firstInvalidField) { if (firstInvalidField.id === 'adoptable_status_group' || firstInvalidField.classList.contains('ic-chamber-diagram')) firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' }); else { firstInvalidField.focus(); firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' }); } } return; }
+
+             const payload = buildJsonPayload(); // Get payload *before* fetch
+
+             // Optional Webhook:
+             // fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(...)
+
+             // --- Save to localStorage ---
+             try {
+                 const configToSave = { ...payload };
+                 configToSave.savedId = `suds-chamber-${Date.now()}`;
+                 configToSave.savedTimestamp = new Date().toISOString();
+
+                 const existingConfigsRaw = localStorage.getItem(savedConfigStorageKey);
+                 let savedConfigs = [];
+                 if (existingConfigsRaw) { try { savedConfigs = JSON.parse(existingConfigsRaw); if (!Array.isArray(savedConfigs)) savedConfigs = []; } catch (e) { console.error("Error parsing existing localStorage data:", e); savedConfigs = []; } }
+
+                 savedConfigs.push(configToSave);
+                 localStorage.setItem(savedConfigStorageKey, JSON.stringify(savedConfigs));
+                 console.log("Universal Chamber configuration saved to localStorage.");
+                 submitStatus.textContent = 'Chamber configuration saved successfully!';
+                 submitStatus.className = 'suds_status_success';
+             } catch (storageError) {
+                 console.error("Error saving Chamber configuration to localStorage:", storageError);
+                 submitStatus.textContent = 'Saving to local storage failed: ' + (storageError.message || 'Unknown error.');
+                 submitStatus.className = 'suds_status_error';
+             }
+             // --- End localStorage Save ---
+
+             form.reset(); activeInletPositions.forEach(pos => { const diagramEl = document.querySelector(`.ic-inlet[data-position="${pos}"]`); if (diagramEl) diagramEl.classList.remove('selected'); }); activeInletPositions = []; activeInletConfigsContainer.innerHTML = ''; inletSelectorErrorDiv.textContent = ''; document.querySelector('.ic-chamber-diagram').style.borderColor = 'transparent'; populateDepthOptions(); updateChamberSystemView(chamberSystemTypeSelect.value); updateProductCodeDisplay(); updateQuoteDisplay();
+        });
+
+        function buildJsonPayload() {
+            const formData = new FormData(form); const quote = calculateQuote(); const costPrice = quote.total; const markupPercent = parseFloat(profitMarkupInput.value) || 0; const sellPrice = costPrice * (1 + markupPercent / 100);
+            const payload = { product_type: "universal_chamber", system_type_selection: formData.get('chamber_system_type'), water_application_selection: formData.get('water_application_type'), adoptable_status: formData.get('adoptable_status'), derived_product_name: getProductName(), generated_product_code: productCodeDisplay.textContent.startsWith('Please') ? null : productCodeDisplay.textContent, main_chamber: { chamber_depth_mm: parseFloat(formData.get('ic_chamber_depth'))||null, chamber_diameter: formData.get('ic_chamber_diameter') }, inlets: [], quote_details: { items: quote.items, cost_price: costPrice, profit_markup_percent: markupPercent, estimated_sell_price: sellPrice } };
+            activeInletPositions.forEach(pos => { const s=pos.replace(":", ""); const ps=form.querySelector(`#inlet_pipe_size_${s}`); const pm=form.querySelector(`#inlet_pipe_material_${s}`); const inletData = { position: pos, pipe_size: ps?.value||null, pipe_material: pm?.value||null }; const oi=form.querySelector(`#inlet_pipe_material_other_${s}`); if (inletData.pipe_material==='Other'&&oi){inletData.pipe_material_other=oi.value;} payload.inlets.push(inletData); });
+            return payload;
+        }
+
+    });
+    </script>
+</body>
+</html>

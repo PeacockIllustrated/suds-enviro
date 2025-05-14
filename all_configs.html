@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuDS Enviro - Saved Configurations</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            padding-top: 80px; /* Default for desktop */
+            font-family: 'Montserrat', sans-serif;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--suds-blue);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        #config-list {
+            list-style: none;
+            padding: 0;
+        }
+        .config-item {
+            background-color: var(--suds-bg-light);
+            border: 1px solid var(--suds-border-light);
+            border-left: 5px solid var(--suds-green);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .config-item-details {
+            flex-grow: 1;
+        }
+        .config-item strong {
+            color: var(--suds-text-heading);
+            font-size: 1.1em;
+        }
+        .config-item p {
+            margin: 5px 0;
+            font-size: 0.9em;
+            color: var(--suds-text-dark);
+        }
+        .config-item .timestamp {
+            font-size: 0.8em;
+            color: #777;
+        }
+        .config-item-actions button {
+            background-color: var(--suds-red);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+            margin-left: 10px;
+        }
+        .config-item-actions button:hover {
+            background-color: #a53c3a;
+        }
+        .config-item-actions button.view-details-btn {
+            background-color: var(--suds-blue);
+        }
+        .config-item-actions button.view-details-btn:hover {
+            background-color: #16699b;
+        }
+        .config-item pre {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-top: 10px;
+            display: none; /* Hidden by default */
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #export-configs-btn, #clear-all-configs-btn {
+            display: inline-block; 
+            margin: 20px 10px 20px 0; 
+            padding: 12px 25px;
+            background-color: var(--suds-green);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #clear-all-configs-btn {
+            background-color: var(--suds-red);
+        }
+        #export-configs-btn:hover {
+            background-color: #4a9d45;
+        }
+        #clear-all-configs-btn:hover {
+            background-color: #a53c3a;
+        }
+        .buttons-container { 
+            text-align: center;
+        }
+
+         @media (max-width: 768px) {
+            body { padding-top: 110px; } 
+            .config-item { flex-direction: column; align-items: flex-start;}
+            .config-item-actions { margin-top: 10px; width: 100%; display: flex; }
+            .config-item-actions button { flex-grow: 1; margin-left: 0; margin-right: 5px;}
+            .config-item-actions button:last-child { margin-right: 0;}
+            #export-configs-btn, #clear-all-configs-btn { display: block; margin: 10px auto; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="https://uploads-ssl.webflow.com/6662e401ea62d861a416088f/6662e78d9725ab79209f1b60_Primary%20Logo%20-%20Colour.svg" alt="SuDS Enviro Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Tools Hub</a></li>
+            <li><a href="planner.html">Drainage Planner</a></li>
+            <li><a href="all_configs.html" class="active">Saved Configurations</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>Saved Product Configurations</h1>
+        <div class="buttons-container">
+            <button id="export-configs-btn">Export All Configurations (JSON)</button>
+            <button id="clear-all-configs-btn">Clear All Saved Configurations</button>
+        </div>
+        <ul id="config-list">
+            <p>No configurations found in local storage, or they are being loaded...</p>
+        </ul>
+    </div>
+
+    <script src="js/all_configs.js"></script>
+</body>
+</html>

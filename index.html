@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuDS Enviro - Internal Tools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Align to top */
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .hub-container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-top: 20px; /* Space from navbar */
+            max-width: 800px;
+            width: 90%;
+        }
+        .hub-container h1 {
+            color: var(--suds-blue);
+            margin-bottom: 30px;
+        }
+        .tool-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            list-style: none;
+            padding: 0;
+        }
+        .tool-links li a {
+            display: block;
+            background-color: var(--suds-green);
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .tool-links li a:hover {
+            background-color: #4a9d45; /* Darker green */
+            transform: translateY(-2px);
+        }
+         .tool-links li a.planner-link { background-color: var(--suds-blue); }
+         .tool-links li a.planner-link:hover { background-color: #16699b; }
+         .tool-links li a.configs-link { background-color: var(--suds-text-dark); }
+         .tool-links li a.configs-link:hover { background-color: #555; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="https://uploads-ssl.webflow.com/6662e401ea62d861a416088f/6662e78d9725ab79209f1b60_Primary%20Logo%20-%20Colour.svg" alt="SuDS Enviro Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">Tools Hub</a></li>
+            <li><a href="planner.html">Drainage Planner</a></li>
+            <li><a href="all_configs.html">Saved Configurations</a></li>
+        </ul>
+    </nav>
+
+    <div class="hub-container">
+        <h1>SuDS Enviro Internal Configuration Tools</h1>
+        <ul class="tool-links">
+            <li><a href="planner.html" class="planner-link">Drainage System Planner</a></li>
+            <li><a href="catchpit.html">Catchpit Configurator</a></li>
+            <li><a href="orifice.html">Orifice Flow Control Configurator</a></li>
+            <li><a href="universal_chamber.html">Universal Chamber Configurator</a></li>
+            <li><a href="separator.html">Hydrodynamic Separator Configurator</a></li>
+            <li><a href="all_configs.html" class="configs-link">View All Saved Product Configurations</a></li>
+        </ul>
+    </div>
+</body>
+</html>

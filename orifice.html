@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SudsEnviro - Orifice Flow Control Configurator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css"> <!-- Shared CSS -->
+    <style>
+        /* --- Copied CSS from original Orifice form --- */
+        :root {
+            --suds-blue: #1d80b9; --suds-green: #54b54d; --suds-red: #c34c4a;
+            --suds-text-dark: #333; --suds-text-heading: var(--suds-blue);
+            --suds-text-label-green: var(--suds-green); --suds-border-light: #d1d5db;
+            --suds-bg-light: #f9fafb; --suds-bg-conditional: #eef7ff;
+            --suds-select-bg: #e0e8f0; --suds-select-arrow: var(--suds-blue);
+        }
+        body {
+            font-family: 'Montserrat', sans-serif; line-height: 1.6; margin: 0; padding: 20px;
+            background-color: #f0f2f5; color: var(--suds-text-dark);
+            padding-top: 80px; /* Ensure content below navbar */
+        }
+        .suds-configurator-form {
+            max-width: 750px; margin: 20px auto; padding: 30px; background: #fff;
+            border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+        }
+        .suds-form-section {
+            border: 1px solid var(--suds-border-light); padding: 25px; margin-bottom: 30px;
+            border-radius: 6px; background-color: var(--suds-bg-light);
+        }
+        h2, h3 {
+            color: var(--suds-text-heading); font-weight: 700; margin-top: 0;
+            padding-bottom: 12px; border-bottom: 2px solid var(--suds-blue);
+            text-transform: uppercase;
+        }
+        h2 { font-size: 1.8em; margin-bottom: 25px; }
+        h3 { font-size: 1.4em; margin-bottom: 20px; margin-top: 30px; border-bottom-width: 1px; }
+        .suds-form-group { margin-bottom: 20px; }
+        .suds-label {
+            display: block; margin-bottom: 8px; font-weight: 600;
+            color: var(--suds-text-label-green); font-size: 0.95em;
+        }
+        .suds-input, .suds-select {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--suds-border-light);
+            border-radius: 20px; box-sizing: border-box; font-size: 0.95em;
+            color: var(--suds-text-dark); transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .suds-input { background-color: #fff; }
+        .suds-input[readonly] { background-color: #f3f4f6; cursor: not-allowed; }
+        .suds-select {
+            background-color: var(--suds-select-bg); appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            padding-right: 40px; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231d80b9%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat; background-position: right 15px center; background-size: 12px 12px; cursor: pointer;
+        }
+         .suds-select:disabled { background-color: #e5e7eb; cursor: not-allowed; opacity: 0.7; }
+        .suds-input:focus, .suds-select:focus { border-color: var(--suds-blue); outline: none; box-shadow: 0 0 0 3px rgba(29, 128, 185, 0.3); }
+        .suds-input::placeholder { color: #a0aec0; }
+        .suds-radio-group { display: flex; flex-wrap: wrap; gap: 25px; align-items: center; }
+        .suds-radio-group div { display: flex; align-items: center; }
+        .suds-radio-group label { font-weight: 500; color: var(--suds-text-dark); margin-left: 5px; cursor: pointer; }
+        .suds-radio-group input[type="radio"] { margin-right: 0; cursor: pointer; accent-color: var(--suds-blue); width: 1em; height: 1em; }
+        .suds-button { padding: 12px 20px; border: none; border-radius: 25px; cursor: pointer; font-size: 0.95em; font-weight: 600; text-align: center; transition: all 0.2s ease; letter-spacing: 0.5px; display: inline-block; }
+        .suds-button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .suds-submit-btn { background-color: var(--suds-blue); color: white; width: 100%; display: block; margin-top: 25px; font-size: 1em; font-weight: 700; padding: 14px 25px; }
+        .suds-submit-btn:hover { background-color: #186a9e; }
+        #suds_product_code_display_container { margin-top: 25px; margin-bottom: 20px; padding: 15px; background-color: var(--suds-bg-conditional); border: 1px solid var(--suds-blue); border-radius: 8px; text-align: center; }
+        #suds_product_code_display_label { font-weight: 600; color: var(--suds-text-heading); display: block; margin-bottom: 5px; font-size: 0.9em; }
+        #suds_product_code_display { font-weight: 700; color: var(--suds-text-dark); font-size: 1.1em; word-break: break-all; }
+        #suds_submit_status { margin-top: 20px; font-weight: 500; text-align: center; padding: 12px; border-radius: 6px; }
+        .suds_status_success { background-color: #e8f5e9; color: var(--suds-green); border: 1px solid var(--suds-green); }
+        .suds_status_error { background-color: #ffebee; color: var(--suds-red); border: 1px solid var(--suds-red); }
+        .suds-error-message { color: var(--suds-red); font-size: 0.85em; margin-top: 6px; }
+        .suds-conditional-options{padding:15px;border-left:4px solid var(--suds-blue);margin-top:15px;margin-bottom:15px;background-color:#fff;border-radius:6px;box-shadow:inset 2px 0 5px rgba(29,128,185,.05)}
+        #shopping_list_details{border:1px solid var(--suds-blue);border-radius:8px;margin-top:30px;background-color:#fdfdfe}#shopping_list_summary{font-weight:700;font-size:1.1em;padding:15px 20px;cursor:pointer;color:var(--suds-blue);display:block;list-style:none;position:relative}#shopping_list_summary::-webkit-details-marker{display:none}#shopping_list_summary::after{content:'▼';font-size:.8em;position:absolute;right:20px;top:50%;transform:translateY(-50%);transition:transform .2s ease-out}#shopping_list_details[open]>#shopping_list_summary::after{transform:translateY(-50%) rotate(180deg)}
+        #shopping_list_container{padding:0 20px 20px}
+        #shopping_list_items{list-style:none;padding:0;margin:0 0 15px;max-height:300px;overflow-y:auto;border-bottom:1px solid var(--suds-border-light);padding-bottom:15px}#shopping_list_items li{display:flex;justify-content:space-between;padding:8px 0;font-size:.9em;border-bottom:1px dashed #e5e7eb}#shopping_list_items li:last-child{border-bottom:none}#shopping_list_items .item-description{color:var(--suds-text-dark)}#shopping_list_items .item-cost{font-weight:600;color:var(--suds-green)}
+        .quote-calculation-area { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--suds-border-light); }
+        .markup-group { margin-bottom: 15px; max-width: 250px; }
+        .markup-group .suds-input { border-radius: 6px; }
+        .markup-group .suds-label { color: var(--suds-text-dark); font-weight: 500;}
+        #shopping_list_total, #shopping_list_sell_price { text-align: right; font-size: 1.1em; font-weight: 600; padding: 5px 0; }
+        #shopping_list_total span, #shopping_list_sell_price span { display: inline-block; }
+        #cost_price_label, #sell_price_label { color: var(--suds-text-heading); margin-right: 10px; font-weight: 700; }
+        #cost_price_value, #sell_price_value { color: var(--suds-green); font-weight: 700; min-width: 70px; }
+        #sell_price_value { color: var(--suds-blue); }
+        @media (max-width: 768px){h2{font-size:1.6em}h3{font-size:1.3em}.suds-configurator-form{padding:20px}#shopping_list_summary::after{display:none}.markup-group {max-width: none;} body{padding-top: 110px; /* Adjust for taller mobile navbar */} }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="https://uploads-ssl.webflow.com/6662e401ea62d861a416088f/6662e78d9725ab79209f1b60_Primary%20Logo%20-%20Colour.svg" alt="SuDS Enviro Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Tools Hub</a></li>
+            <li><a href="planner.html">Drainage Planner</a></li>
+            <li><a href="catchpit.html">Catchpit Configurator</a></li>
+            <li><a href="orifice.html" class="active">Orifice Configurator</a></li>
+            <li><a href="universal_chamber.html">Universal Chamber</a></li>
+            <li><a href="separator.html">Separator Configurator</a></li>
+            <li><a href="all_configs.html">Saved Configurations</a></li>
+        </ul>
+    </nav>
+
+    <form id="sudsOrificeForm" class="suds-configurator-form">
+        <div class="suds-form-section">
+            <h2>Orifice Flow Control Configuration</h2>
+
+            <h3>Chamber Properties</h3>
+             <div class="suds-form-group">
+                <label class="suds-label">Adoptable Status:</label>
+                <div class="suds-radio-group" id="adoptable_status_group">
+                     <div>
+                        <input type="radio" id="adoptable_yes" name="adoptable_status" value="adoptable" required>
+                        <label for="adoptable_yes">Adoptable</label>
+                     </div>
+                     <div>
+                        <input type="radio" id="adoptable_no" name="adoptable_status" value="non_adoptable" required>
+                        <label for="adoptable_no">Non-Adoptable</label>
+                     </div>
+                </div>
+             </div>
+            <div class="suds-form-group">
+                <label class="suds-label" for="ofc_chamber_depth">Chamber depth (mm):</label>
+                <select class="suds-select" id="ofc_chamber_depth" name="ofc_chamber_depth" required disabled>
+                    <option value="">-- Select Adoptable Status First --</option>
+                </select>
+            </div>
+            <div class="suds-form-group">
+                <label class="suds-label" for="ofc_chamber_diameter">Chamber diameter:</label>
+                <select class="suds-select" id="ofc_chamber_diameter" name="ofc_chamber_diameter" required>
+                    <option value="">-- Select Diameter --</option>
+                    <option value="315mm">315mm</option>
+                    <option value="450mm">450mm</option>
+                    <option value="600mm">600mm</option>
+                    <option value="1050mm">1050mm</option>
+                </select>
+            </div>
+             <div class="suds-form-group">
+                 <label class="suds-label" for="ofc_pipework_size">Pipework Size (Inlet/Outlet):</label>
+                 <select class="suds-select" id="ofc_pipework_size" name="ofc_pipework_size" required>
+                     <option value="">-- Select Size --</option>
+                     <option value="110mm">110mm</option>
+                     <option value="160mm">160mm</option>
+                     <option value="225mm">225mm</option>
+                 </select>
+             </div>
+
+            <h3>Flow Control Parameters</h3>
+            <div class="suds-form-group">
+                <label class="suds-label" for="ofc_target_flow">Target Flow Rate (L/s):</label>
+                <input class="suds-input" type="number" id="ofc_target_flow" name="ofc_target_flow" min="0.1" step="0.1" placeholder="e.g., 5.5" required>
+            </div>
+            <div class="suds-form-group">
+                <label class="suds-label" for="ofc_head_height">Design Head Height (m):</label>
+                <input class="suds-input" type="number" id="ofc_head_height" name="ofc_head_height" min="0.1" step="0.05" placeholder="e.g., 1.2" required>
+            </div>
+             <div class="suds-form-group">
+                <label class="suds-label" for="ofc_orifice_diameter">Orifice Plate Diameter (mm):</label>
+                <input class="suds-input" type="number" id="ofc_orifice_diameter" name="ofc_orifice_diameter" min="10" step="1" placeholder="e.g., 75">
+                <small style="display:block; text-align:center; margin-top: 5px; color: #555;">(Leave blank if calculated based on flow/head)</small>
+            </div>
+            <div class="suds-form-group">
+                <label class="suds-label">Bypass Required?</label>
+                <div class="suds-radio-group" id="bypass_group">
+                     <div>
+                        <input type="radio" id="bypass_yes" name="bypass_required" value="yes">
+                        <label for="bypass_yes">Yes</label>
+                     </div>
+                     <div>
+                        <input type="radio" id="bypass_no" name="bypass_required" value="no" checked>
+                        <label for="bypass_no">No</label>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="suds_product_code_display_container">
+            <span id="suds_product_code_display_label">Generated Product Code:</span>
+            <span id="suds_product_code_display">Please make selections...</span>
+        </div>
+
+        <details id="shopping_list_details">
+            <summary id="shopping_list_summary">Estimated Quote / Shopping List</summary>
+            <div id="shopping_list_container">
+                <ul id="shopping_list_items">
+                    <li>Select options to see quote...</li>
+                </ul>
+                <div class="quote-calculation-area">
+                    <div class="suds-form-group markup-group">
+                        <label class="suds-label" for="profit_markup_percent">Profit Markup (%):</label>
+                        <input type="number" id="profit_markup_percent" name="profit_markup_percent" class="suds-input" min="0" step="0.1" value="0" placeholder="e.g., 15.5">
+                    </div>
+                    <div id="shopping_list_total">
+                        <span id="cost_price_label">Cost Price:</span>
+                        <span id="cost_price_value">£0.00</span>
+                    </div>
+                    <div id="shopping_list_sell_price">
+                        <span id="sell_price_label">Sell Price (inc. Markup):</span>
+                        <span id="sell_price_value">£0.00</span>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <button type="submit" class="suds-submit-btn">Submit Orifice Configuration</button>
+        <div id="suds_submit_status"></div>
+    </form>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Pricing Rules for Orifice Flow Control
+        const pricingRules = { base: 70.00, adoptable_status: {'adoptable': 60.00, 'non_adoptable': 0}, depth_base: 80.00, depth_per_150mm_step: 15.00, diameter: {'315mm': 0, '450mm': 50.00, '600mm': 110.00, '1050mm': 280.00}, pipe_size_connection: { '110mm': 10.00, '160mm': 15.00, '225mm': 25.00 }, orifice_plate_base: 45.00, orifice_diameter_adder: 0.25, bypass_adder: 120.00 };
+
+        // DOM References
+        const form = document.getElementById('sudsOrificeForm');
+        const submitStatus = document.getElementById('suds_submit_status');
+        const webhookUrl = 'https://mkiminstest.app.n8n.cloud/webhook-test/862c9207-f6dd-4ee7-ae40-4658d15de3d0';
+        const productCodeDisplay = document.getElementById('suds_product_code_display');
+        const shoppingListItemsUl = document.getElementById('shopping_list_items');
+        const costPriceValueSpan = document.getElementById('cost_price_value');
+        const sellPriceValueSpan = document.getElementById('sell_price_value');
+        const profitMarkupInput = document.getElementById('profit_markup_percent');
+        const chamberDepthSelect = document.getElementById('ofc_chamber_depth');
+        const chamberDiameterSelect = document.getElementById('ofc_chamber_diameter');
+        const adoptableStatusGroup = document.getElementById('adoptable_status_group');
+        const pipeworkSizeSelect = document.getElementById('ofc_pipework_size');
+        const targetFlowInput = document.getElementById('ofc_target_flow');
+        const headHeightInput = document.getElementById('ofc_head_height');
+        const orificeDiameterInput = document.getElementById('ofc_orifice_diameter');
+        const bypassGroup = document.getElementById('bypass_group');
+        const savedConfigStorageKey = 'sudsSavedConfigs'; // LocalStorage Key
+
+        // --- Helper Functions ---
+        function formatCurrency(value) { return `£${value.toFixed(2)}`; }
+
+        function populateDepthOptions() { const selectedAdoptable = document.querySelector('input[name="adoptable_status"]:checked'); const adoptableValue = selectedAdoptable?.value; const currentDepthValue = chamberDepthSelect.value; chamberDepthSelect.innerHTML = ''; if (!adoptableValue) { chamberDepthSelect.disabled = true; const o=document.createElement('option');o.value="";o.textContent="-- Select Adoptable Status First --";chamberDepthSelect.appendChild(o);updateProductCodeDisplay();updateQuoteDisplay();return; } chamberDepthSelect.disabled = false; const dO=document.createElement('option');dO.value="";dO.textContent="-- Select Depth --";chamberDepthSelect.appendChild(dO); const minD=600; const maxD=(adoptableValue==='adoptable')?3000:6000; const inc=150; for (let d=minD; d<=maxD; d+=inc) { const o=document.createElement('option');o.value=d;o.textContent=`${d}mm`;chamberDepthSelect.appendChild(o); } if (currentDepthValue&&chamberDepthSelect.querySelector(`option[value="${currentDepthValue}"]`)){chamberDepthSelect.value=currentDepthValue;} else {chamberDepthSelect.value="";} updateProductCodeDisplay();updateQuoteDisplay(); }
+
+        function calculateQuote() { let totalCost = 0; const items = []; const formData = new FormData(form); totalCost += pricingRules.base; items.push({ description: "Orifice Chamber Base", cost: pricingRules.base }); const adoptableStatus = formData.get('adoptable_status'); if (adoptableStatus && pricingRules.adoptable_status[adoptableStatus]) { const c=pricingRules.adoptable_status[adoptableStatus]; if(c>0)items.push({description:`Status: ${adoptableStatus.charAt(0).toUpperCase() + adoptableStatus.slice(1)}`, cost: c }); totalCost += c; } const depth = parseFloat(formData.get('ofc_chamber_depth')); if (depth && depth >= 600) { let depthCost = pricingRules.depth_base; const steps = (depth - 600) / 150; depthCost += steps * pricingRules.depth_per_150mm_step; items.push({description:`Depth: ${depth}mm`,cost:depthCost}); totalCost+=depthCost; } const diameter = formData.get('ofc_chamber_diameter'); if (diameter && pricingRules.diameter[diameter]) { const c=pricingRules.diameter[diameter]; if(c>0)items.push({description:`Diameter: ${diameter}`,cost:c}); totalCost+=c; } const pipeSize = formData.get('ofc_pipework_size'); if (pipeSize && pricingRules.pipe_size_connection[pipeSize]){ const connectionCost = pricingRules.pipe_size_connection[pipeSize] * 2; items.push({description: `Inlet/Outlet Connections (${pipeSize})`, cost: connectionCost}); totalCost += connectionCost; } let plateCost = pricingRules.orifice_plate_base; const orificeDiameter = parseFloat(formData.get('ofc_orifice_diameter')); if(orificeDiameter && orificeDiameter > 0) { plateCost += orificeDiameter * pricingRules.orifice_diameter_adder; items.push({description: `Orifice Plate (${orificeDiameter}mm)`, cost: plateCost}); } else { items.push({description: `Orifice Plate (Calculated Size)`, cost: plateCost}); } totalCost += plateCost; const bypassRequired = formData.get('bypass_required'); if (bypassRequired === 'yes') { items.push({description: "Bypass Included", cost: pricingRules.bypass_adder}); totalCost += pricingRules.bypass_adder; } return { total: totalCost, items: items }; }
+
+        function updateQuoteDisplay() { const quote=calculateQuote(); const costPrice=quote.total; const markupPercent=parseFloat(profitMarkupInput.value)||0; const sellPrice=costPrice*(1+markupPercent/100); shoppingListItemsUl.innerHTML=''; if(quote.items.length>0){quote.items.forEach(item=>{const li=document.createElement('li');li.innerHTML=`<span class="item-description">${item.description}</span><span class="item-cost">${formatCurrency(item.cost)}</span>`;shoppingListItemsUl.appendChild(li);});}else{shoppingListItemsUl.innerHTML='<li>Select options to see quote...</li>';} costPriceValueSpan.textContent=formatCurrency(costPrice); sellPriceValueSpan.textContent=formatCurrency(sellPrice); }
+        function updateProductCodeDisplay() { const adoptable = document.querySelector('input[name="adoptable_status"]:checked')?.value === 'adoptable' ? 'AD' : 'NA'; const depth = chamberDepthSelect.value || 'DEPTH'; const diameter = chamberDiameterSelect.value ? chamberDiameterSelect.value.replace('mm','') : 'DIAM'; const flow = targetFlowInput.value ? targetFlowInput.value + 'LPS' : 'FLOW'; const head = headHeightInput.value ? headHeightInput.value + 'MHD' : 'HEAD'; const bypass = document.querySelector('input[name="bypass_required"]:checked')?.value === 'yes' ? '-BY' : ''; const adoptableSelected = form.querySelector('input[name="adoptable_status"]:checked'); if(depth === 'DEPTH' || diameter === 'DIAM' || flow === 'FLOW' || head === 'HEAD' || !adoptableSelected || !chamberDepthSelect.value) { productCodeDisplay.textContent='Please complete selections...'; return; } productCodeDisplay.textContent = `OFC-${diameter}-${depth}-${flow}-${head}-${adoptable}${bypass}`; }
+        function updateQuoteAndCode() { updateProductCodeDisplay(); updateQuoteDisplay(); }
+
+        const elementsTriggeringUpdates = [ chamberDepthSelect, chamberDiameterSelect, adoptableStatusGroup, pipeworkSizeSelect, targetFlowInput, headHeightInput, orificeDiameterInput, profitMarkupInput, bypassGroup ];
+        elementsTriggeringUpdates.forEach(el => { el.addEventListener('change', updateQuoteAndCode); if (el.type === 'number' || el.type === 'text') { el.addEventListener('keyup', updateQuoteAndCode); el.addEventListener('input', updateQuoteAndCode); } });
+        adoptableStatusGroup.addEventListener('change', () => { populateDepthOptions(); });
+
+        populateDepthOptions(); updateProductCodeDisplay(); updateQuoteDisplay();
+
+        form.addEventListener('submit', function(event) {
+             event.preventDefault(); submitStatus.textContent = 'Submitting...'; submitStatus.className = ''; form.querySelectorAll('.suds-input, .suds-select').forEach(el => el.style.borderColor = ''); adoptableStatusGroup.style.outline = 'none'; let isValid = true; const adoptableSelected = form.querySelector('input[name="adoptable_status"]:checked'); if (!adoptableSelected) { isValid = false; adoptableStatusGroup.style.outline = '2px solid var(--suds-red)'; } else { adoptableStatusGroup.style.outline = 'none'; }
+             const requiredStaticFields = form.querySelectorAll('#ofc_chamber_depth[required], #ofc_chamber_diameter[required], #ofc_pipework_size[required], #ofc_target_flow[required], #ofc_head_height[required]');
+             requiredStaticFields.forEach(input => { if ((input.tagName === 'SELECT' && input.value === "") || (input.tagName !== 'SELECT' && !input.value.trim())) { isValid = false; input.style.borderColor = 'var(--suds-red)'; } else { input.style.borderColor = ''; } });
+             if (!isValid) { submitStatus.textContent = 'Please fill in all required fields.'; submitStatus.className = 'suds_status_error'; const firstInvalidField = form.querySelector('[style*="border-color: var(--suds-red)"], [style*="outline"]'); if (firstInvalidField) { if (firstInvalidField.id === 'adoptable_status_group') firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' }); else { firstInvalidField.focus(); firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' }); } } return; }
+
+             const payload = buildJsonPayload(); // Get payload before fetch
+
+             // Optional Webhook submission can be kept or removed
+             // fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(...)
+
+             // --- Save to localStorage ---
+             try {
+                 const configToSave = { ...payload };
+                 configToSave.savedId = `suds-ofc-${Date.now()}`;
+                 configToSave.savedTimestamp = new Date().toISOString();
+                 // Add derived_product_name for planner
+                 configToSave.derived_product_name = `OFC ${configToSave.flow_control_params.target_flow_lps || 'N/A'}LPS`;
+
+
+                 const existingConfigsRaw = localStorage.getItem(savedConfigStorageKey);
+                 let savedConfigs = [];
+                 if (existingConfigsRaw) { try { savedConfigs = JSON.parse(existingConfigsRaw); if (!Array.isArray(savedConfigs)) savedConfigs = []; } catch (e) { console.error("Error parsing existing localStorage data:", e); savedConfigs = []; } }
+
+                 savedConfigs.push(configToSave);
+                 localStorage.setItem(savedConfigStorageKey, JSON.stringify(savedConfigs));
+                 console.log("Orifice configuration saved to localStorage.");
+                 submitStatus.textContent = 'Orifice configuration saved successfully!';
+                 submitStatus.className = 'suds_status_success';
+             } catch (storageError) {
+                 console.error("Error saving Orifice configuration to localStorage:", storageError);
+                 submitStatus.textContent = 'Saving to local storage failed: ' + (storageError.message || 'Unknown error.');
+                 submitStatus.className = 'suds_status_error';
+             }
+             // --- End localStorage Save ---
+
+             form.reset(); populateDepthOptions(); updateProductCodeDisplay(); updateQuoteDisplay();
+        });
+
+        function buildJsonPayload() {
+            const formData = new FormData(form); const quote = calculateQuote(); const costPrice = quote.total; const markupPercent = parseFloat(profitMarkupInput.value) || 0; const sellPrice = costPrice * (1 + markupPercent / 100);
+            const payload = { product_type: "orifice_flow_control", adoptable_status: formData.get('adoptable_status'), generated_product_code: productCodeDisplay.textContent.startsWith('Please') ? null : productCodeDisplay.textContent, chamber_details: { chamber_depth_mm: parseFloat(formData.get('ofc_chamber_depth'))||null, chamber_diameter: formData.get('ofc_chamber_diameter'), pipework_size: formData.get('ofc_pipework_size') }, flow_control_params: { target_flow_lps: parseFloat(formData.get('ofc_target_flow')) || null, design_head_m: parseFloat(formData.get('ofc_head_height')) || null, orifice_diameter_mm: parseFloat(formData.get('ofc_orifice_diameter')) || null, bypass_required: formData.get('bypass_required') === 'yes' }, quote_details: { items: quote.items, cost_price: costPrice, profit_markup_percent: markupPercent, estimated_sell_price: sellPrice } };
+            return payload;
+        }
+
+    });
+    </script>
+</body>
+</html>

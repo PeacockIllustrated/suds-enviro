@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SudsEnviro - Hydrodynamic Separator Configurator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css"> <!-- Shared CSS -->
+    <style>
+        /* --- Styles (Keep as is from original Separator form) --- */
+        :root {
+            --suds-blue: #1d80b9; --suds-green: #54b54d; --suds-red: #c34c4a;
+            --suds-text-dark: #333; --suds-text-heading: var(--suds-blue);
+            --suds-text-label-green: var(--suds-green); --suds-border-light: #d1d5db;
+            --suds-bg-light: #f9fafb; --suds-bg-conditional: #eef7ff;
+            --suds-select-bg: #e0e8f0; --suds-select-arrow: var(--suds-blue);
+        }
+        body {
+            font-family: 'Montserrat', sans-serif; line-height: 1.6; margin: 0; padding: 20px;
+            background-color: #f0f2f5; color: var(--suds-text-dark);
+            padding-top: 80px; /* Ensure content below navbar */
+        }
+        .suds-configurator-form {
+            max-width: 750px; margin: 20px auto; padding: 30px; background: #fff;
+            border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+        }
+        .suds-form-section {
+            border: 1px solid var(--suds-border-light); padding: 25px; margin-bottom: 30px;
+            border-radius: 6px; background-color: var(--suds-bg-light);
+        }
+        h2, h3 {
+            color: var(--suds-text-heading); font-weight: 700; margin-top: 0;
+            padding-bottom: 12px; border-bottom: 2px solid var(--suds-blue);
+            text-transform: uppercase;
+        }
+        h2 { font-size: 1.8em; margin-bottom: 25px; }
+        h3 { font-size: 1.4em; margin-bottom: 20px; margin-top: 30px; border-bottom-width: 1px; }
+        .suds-form-group { margin-bottom: 20px; }
+        .suds-label {
+            display: block; margin-bottom: 8px; font-weight: 600;
+            color: var(--suds-text-label-green); font-size: 0.95em;
+        }
+        .suds-input, .suds-select {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--suds-border-light);
+            border-radius: 20px; box-sizing: border-box; font-size: 0.95em;
+            color: var(--suds-text-dark); transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .suds-input { background-color: #fff; }
+        .suds-input[readonly] { background-color: #f3f4f6; cursor: not-allowed; }
+        .suds-select {
+            background-color: var(--suds-select-bg); appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            padding-right: 40px; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231d80b9%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat; background-position: right 15px center; background-size: 12px 12px; cursor: pointer;
+        }
+         .suds-select:disabled { background-color: #e5e7eb; cursor: not-allowed; opacity: 0.7; }
+        .suds-input:focus, .suds-select:focus { border-color: var(--suds-blue); outline: none; box-shadow: 0 0 0 3px rgba(29, 128, 185, 0.3); }
+        .suds-input::placeholder { color: #a0aec0; }
+        .suds-radio-group, .suds-checkbox-group { display: flex; flex-wrap: wrap; gap: 25px; align-items: center; padding: 5px 0;}
+        .suds-radio-group div, .suds-checkbox-group div { display: flex; align-items: center; }
+        .suds-radio-group label, .suds-checkbox-group label { font-weight: 500; color: var(--suds-text-dark); margin-left: 5px; cursor: pointer; }
+        .suds-radio-group input[type="radio"], .suds-checkbox-group input[type="checkbox"] { margin-right: 0; cursor: pointer; accent-color: var(--suds-blue); width: 1em; height: 1em; }
+        .suds-button { padding: 12px 20px; border: none; border-radius: 25px; cursor: pointer; font-size: 0.95em; font-weight: 600; text-align: center; transition: all 0.2s ease; letter-spacing: 0.5px; display: inline-block; }
+        .suds-button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .suds-submit-btn { background-color: var(--suds-blue); color: white; width: 100%; display: block; margin-top: 25px; font-size: 1em; font-weight: 700; padding: 14px 25px; }
+        .suds-submit-btn:hover { background-color: #186a9e; }
+        #suds_product_code_display_container { margin-top: 25px; margin-bottom: 20px; padding: 15px; background-color: var(--suds-bg-conditional); border: 1px solid var(--suds-blue); border-radius: 8px; text-align: center; }
+        #suds_product_code_display_label { font-weight: 600; color: var(--suds-text-heading); display: block; margin-bottom: 5px; font-size: 0.9em; }
+        #suds_product_code_display { font-weight: 700; color: var(--suds-text-dark); font-size: 1.1em; word-break: break-all; }
+        #suds_submit_status { margin-top: 20px; font-weight: 500; text-align: center; padding: 12px; border-radius: 6px; }
+        .suds_status_success { background-color: #e8f5e9; color: var(--suds-green); border: 1px solid var(--suds-green); }
+        .suds_status_error { background-color: #ffebee; color: var(--suds-red); border: 1px solid var(--suds-red); }
+        .suds-error-message { color: var(--suds-red); font-size: 0.85em; margin-top: 6px; }
+        .suds-conditional-options{padding:15px;border-left:4px solid var(--suds-blue);margin-top:15px;margin-bottom:15px;background-color:#fff;border-radius:6px;box-shadow:inset 2px 0 5px rgba(29,128,185,.05)}
+        #shopping_list_details{border:1px solid var(--suds-blue);border-radius:8px;margin-top:30px;background-color:#fdfdfe}#shopping_list_summary{font-weight:700;font-size:1.1em;padding:15px 20px;cursor:pointer;color:var(--suds-blue);display:block;list-style:none;position:relative}#shopping_list_summary::-webkit-details-marker{display:none}#shopping_list_summary::after{content:'▼';font-size:.8em;position:absolute;right:20px;top:50%;transform:translateY(-50%);transition:transform .2s ease-out}#shopping_list_details[open]>#shopping_list_summary::after{transform:translateY(-50%) rotate(180deg)}
+        #shopping_list_container{padding:0 20px 20px}
+        #shopping_list_items{list-style:none;padding:0;margin:0 0 15px;max-height:300px;overflow-y:auto;border-bottom:1px solid var(--suds-border-light);padding-bottom:15px}#shopping_list_items li{display:flex;justify-content:space-between;padding:8px 0;font-size:.9em;border-bottom:1px dashed #e5e7eb}#shopping_list_items li:last-child{border-bottom:none}#shopping_list_items .item-description{color:var(--suds-text-dark)}#shopping_list_items .item-cost{font-weight:600;color:var(--suds-green)}
+        .quote-calculation-area { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--suds-border-light); }
+        .markup-group { margin-bottom: 15px; max-width: 250px; }
+        .markup-group .suds-input { border-radius: 6px; }
+        .markup-group .suds-label { color: var(--suds-text-dark); font-weight: 500;}
+        #shopping_list_total, #shopping_list_sell_price { text-align: right; font-size: 1.1em; font-weight: 600; padding: 5px 0; }
+        #shopping_list_total span, #shopping_list_sell_price span { display: inline-block; }
+        #cost_price_label, #sell_price_label { color: var(--suds-text-heading); margin-right: 10px; font-weight: 700; }
+        #cost_price_value, #sell_price_value { color: var(--suds-green); font-weight: 700; min-width: 70px; }
+        #sell_price_value { color: var(--suds-blue); }
+        @media (max-width: 768px){h2{font-size:1.6em}h3{font-size:1.3em}.suds-configurator-form{padding:20px}#shopping_list_summary::after{display:none}.markup-group {max-width: none;} body{padding-top: 110px;} }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="https://uploads-ssl.webflow.com/6662e401ea62d861a416088f/6662e78d9725ab79209f1b60_Primary%20Logo%20-%20Colour.svg" alt="SuDS Enviro Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Tools Hub</a></li>
+            <li><a href="planner.html">Drainage Planner</a></li>
+            <li><a href="catchpit.html">Catchpit Configurator</a></li>
+            <li><a href="orifice.html">Orifice Configurator</a></li>
+            <li><a href="universal_chamber.html">Universal Chamber</a></li>
+            <li><a href="separator.html" class="active">Separator Configurator</a></li>
+            <li><a href="all_configs.html">Saved Configurations</a></li>
+        </ul>
+    </nav>
+
+    <form id="sudsSeparatorForm" class="suds-configurator-form">
+        <div class="suds-form-section">
+            <h2>Hydrodynamic Separator Configuration</h2>
+
+            <h3>Core Properties</h3>
+            <div class="suds-form-group">
+                <label class="suds-label">Adoptable Status:</label>
+                <div class="suds-radio-group" id="adoptable_status_group">
+                     <div>
+                        <input type="radio" id="adoptable_yes" name="adoptable_status" value="adoptable" required>
+                        <label for="adoptable_yes">Adoptable</label>
+                     </div>
+                     <div>
+                        <input type="radio" id="adoptable_no" name="adoptable_status" value="non_adoptable" required>
+                        <label for="adoptable_no">Non-Adoptable</label>
+                     </div>
+                </div>
+             </div>
+            <div class="suds-form-group">
+                <label class="suds-label" for="hds_depth">Chamber depth (mm):</label>
+                <select class="suds-select" id="hds_depth" name="hds_depth" required disabled>
+                    <option value="">-- Select Adoptable Status First --</option>
+                </select>
+            </div>
+            <div class="suds-form-group">
+                <label class="suds-label" for="hds_flow_rate">Design Flow Rate (L/s):</label>
+                <input class="suds-input" type="number" id="hds_flow_rate" name="hds_flow_rate" min="1" step="1" placeholder="e.g., 25" required>
+            </div>
+            <div class="suds-form-group">
+                 <label class="suds-label" for="hds_pipework_diameter">Pipework Diameter (mm):</label>
+                 <select class="suds-select" id="hds_pipework_diameter" name="hds_pipework_diameter" required>
+                     <option value="">-- Select Size --</option>
+                     <option value="110mm">110mm</option>
+                     <option value="160mm">160mm</option>
+                     <option value="225mm">225mm</option>
+                     <option value="300mm">300mm</option>
+                     <option value="450mm">450mm</option>
+                     <option value="600mm">600mm</option>
+                 </select>
+             </div>
+             <div class="suds-form-group">
+                <label class="suds-label" for="hds_space">Space Available / Model Size:</label>
+                <select class="suds-select" id="hds_space" name="hds_space" required>
+                    <option value="">-- Select Size Class --</option>
+                    <option value="Compact">Compact</option>
+                    <option value="Standard">Standard</option>
+                    <option value="Extended">Extended</option>
+                     <option value="Bespoke">Bespoke (Requires Consultation)</option>
+                </select>
+            </div>
+
+            <h3>Target Contaminants</h3>
+             <div class="suds-form-group">
+                 <label class="suds-label">Select pollutants to target (at least one):</label>
+                 <div class="suds-checkbox-group" id="contaminants_group">
+                      <div>
+                         <input type="checkbox" id="cont_hydrocarbons" name="target_contaminants[]" value="Hydrocarbons">
+                         <label for="cont_hydrocarbons">Hydrocarbons</label>
+                      </div>
+                      <div>
+                          <input type="checkbox" id="cont_floatables" name="target_contaminants[]" value="Floatables">
+                          <label for="cont_floatables">Floatables</label>
+                      </div>
+                      <div>
+                          <input type="checkbox" id="cont_silt" name="target_contaminants[]" value="Silt">
+                          <label for="cont_silt">Silt</label>
+                      </div>
+                 </div>
+                 <div id="contaminants_error" class="suds-error-message"></div>
+             </div>
+        </div>
+
+        <div id="suds_product_code_display_container">
+            <span id="suds_product_code_display_label">Generated Product Code:</span>
+            <span id="suds_product_code_display">Please make selections...</span>
+        </div>
+
+        <details id="shopping_list_details">
+            <summary id="shopping_list_summary">Estimated Quote / Shopping List</summary>
+            <div id="shopping_list_container">
+                <ul id="shopping_list_items">
+                    <li>Select options to see quote...</li>
+                </ul>
+                <div class="quote-calculation-area">
+                    <div class="suds-form-group markup-group">
+                        <label class="suds-label" for="profit_markup_percent">Profit Markup (%):</label>
+                        <input type="number" id="profit_markup_percent" name="profit_markup_percent" class="suds-input" min="0" step="0.1" value="0" placeholder="e.g., 15.5">
+                    </div>
+                    <div id="shopping_list_total">
+                        <span id="cost_price_label">Cost Price:</span>
+                        <span id="cost_price_value">£0.00</span>
+                    </div>
+                    <div id="shopping_list_sell_price">
+                        <span id="sell_price_label">Sell Price (inc. Markup):</span>
+                        <span id="sell_price_value">£0.00</span>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <button type="submit" class="suds-submit-btn">Submit Separator Configuration</button>
+        <div id="suds_submit_status"></div>
+    </form>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Pricing Rules
+        const pricingRules = { base: 600.00, adoptable_status: {'adoptable': 250.00, 'non_adoptable': 0}, depth_base: 150.00, depth_per_150mm_step: 25.00, flow_rate_base: 50.00, flow_rate_per_lps: 15.00, pipe_diameter_adder: { '110mm': 0, '160mm': 20.00, '225mm': 50.00, '300mm': 100.00, '450mm': 200.00, '600mm': 350.00 }, space_multiplier: { 'Compact': 1.0, 'Standard': 1.3, 'Extended': 1.8, 'Bespoke': 3.0 }, contaminant_adder: { 'Hydrocarbons': 150.00, 'Floatables': 50.00, 'Silt': 100.00 } };
+
+        // DOM References
+        const form = document.getElementById('sudsSeparatorForm');
+        const submitStatus = document.getElementById('suds_submit_status');
+        const webhookUrl = 'https://mkiminstest.app.n8n.cloud/webhook-test/862c9207-f6dd-4ee7-ae40-4658d15de3d0';
+        const productCodeDisplay = document.getElementById('suds_product_code_display');
+        const shoppingListItemsUl = document.getElementById('shopping_list_items');
+        const costPriceValueSpan = document.getElementById('cost_price_value');
+        const sellPriceValueSpan = document.getElementById('sell_price_value');
+        const profitMarkupInput = document.getElementById('profit_markup_percent');
+        const chamberDepthSelect = document.getElementById('hds_depth');
+        const adoptableStatusGroup = document.getElementById('adoptable_status_group');
+        const flowRateInput = document.getElementById('hds_flow_rate');
+        const pipeworkDiameterSelect = document.getElementById('hds_pipework_diameter');
+        const spaceSelect = document.getElementById('hds_space');
+        const contaminantsGroup = document.getElementById('contaminants_group');
+        const contaminantsCheckboxes = contaminantsGroup.querySelectorAll('input[type="checkbox"]');
+        const contaminantsErrorDiv = document.getElementById('contaminants_error');
+        const savedConfigStorageKey = 'sudsSavedConfigs'; // LocalStorage Key
+
+        // Helper Functions
+        function formatCurrency(value) { return `£${value.toFixed(2)}`; }
+
+        function populateDepthOptions() { const selectedAdoptable = document.querySelector('input[name="adoptable_status"]:checked'); const adoptableValue = selectedAdoptable?.value; const currentDepthValue = chamberDepthSelect.value; chamberDepthSelect.innerHTML = ''; if (!adoptableValue) { chamberDepthSelect.disabled = true; const o=document.createElement('option');o.value="";o.textContent="-- Select Adoptable Status First --";chamberDepthSelect.appendChild(o);updateProductCodeDisplay();updateQuoteDisplay();return; } chamberDepthSelect.disabled = false; const dO=document.createElement('option');dO.value="";dO.textContent="-- Select Depth --";chamberDepthSelect.appendChild(dO); const minD=1000; const maxD=(adoptableValue==='adoptable')?3000:6000; const inc=150; for (let d=minD; d<=maxD; d+=inc) { const o=document.createElement('option');o.value=d;o.textContent=`${d}mm`;chamberDepthSelect.appendChild(o); } if (currentDepthValue&&chamberDepthSelect.querySelector(`option[value="${currentDepthValue}"]`)){chamberDepthSelect.value=currentDepthValue;} else {chamberDepthSelect.value="";} updateProductCodeDisplay();updateQuoteDisplay(); }
+
+        function calculateQuote() { let totalCost = 0; const items = []; const formData = new FormData(form); totalCost += pricingRules.base; items.push({ description: "Separator Base Unit", cost: pricingRules.base }); const adoptableStatus = formData.get('adoptable_status'); if (adoptableStatus && pricingRules.adoptable_status[adoptableStatus]) { const c=pricingRules.adoptable_status[adoptableStatus]; if(c>0)items.push({description:`Status: ${adoptableStatus.charAt(0).toUpperCase() + adoptableStatus.slice(1)}`, cost: c }); totalCost += c; } const depth = parseFloat(formData.get('hds_depth')); if (depth && depth >= 1000) { let depthCost = pricingRules.depth_base; const steps = (depth - 1000) / 150; depthCost += steps * pricingRules.depth_per_150mm_step; items.push({description:`Depth: ${depth}mm`,cost:depthCost}); totalCost+=depthCost; } const flowRate = parseFloat(formData.get('hds_flow_rate')); if(flowRate && flowRate > 0) { let flowCost = pricingRules.flow_rate_base + (flowRate * pricingRules.flow_rate_per_lps); items.push({description: `Design Flow: ${flowRate} L/s`, cost: flowCost}); totalCost += flowCost; } const pipeDiameter = formData.get('hds_pipework_diameter'); if(pipeDiameter && pricingRules.pipe_diameter_adder[pipeDiameter]) { const c = pricingRules.pipe_diameter_adder[pipeDiameter]; if(c > 0) items.push({description: `Pipework Connections: ${pipeDiameter}`, cost: c * 2}); totalCost += (c*2); } const space = formData.get('hds_space'); if(space && pricingRules.space_multiplier[space]) { const multiplier = pricingRules.space_multiplier[space]; if (multiplier !== 1.0) items.push({description: `Size Class: ${space} (x${multiplier} Base Cost Adj.)`, cost: pricingRules.base * (multiplier - 1)}); totalCost += pricingRules.base * (multiplier - 1); } const selectedContaminants = getSelectedContaminants(); let contaminantTotal = 0; selectedContaminants.forEach(cont => { if(pricingRules.contaminant_adder[cont]) { contaminantTotal += pricingRules.contaminant_adder[cont]; } }); if(contaminantTotal > 0) { items.push({description: `Target Contaminants (${selectedContaminants.join(', ')})`, cost: contaminantTotal}); totalCost += contaminantTotal; } return { total: totalCost, items: items }; }
+
+        function updateQuoteDisplay() { const quote=calculateQuote(); const costPrice=quote.total; const markupPercent=parseFloat(profitMarkupInput.value)||0; const sellPrice=costPrice*(1+markupPercent/100); shoppingListItemsUl.innerHTML=''; if(quote.items.length>0){quote.items.forEach(item=>{const li=document.createElement('li');li.innerHTML=`<span class="item-description">${item.description}</span><span class="item-cost">${formatCurrency(item.cost)}</span>`;shoppingListItemsUl.appendChild(li);});}else{shoppingListItemsUl.innerHTML='<li>Select options to see quote...</li>';} costPriceValueSpan.textContent=formatCurrency(costPrice); sellPriceValueSpan.textContent=formatCurrency(sellPrice); }
+        function getSelectedContaminants() { return Array.from(contaminantsCheckboxes).filter(cb => cb.checked).map(cb => cb.value); }
+        function getContaminantCode() { const selected = getSelectedContaminants(); let code = ""; if (selected.includes("Hydrocarbons")) code += "H"; if (selected.includes("Floatables")) code += "F"; if (selected.includes("Silt")) code += "S"; return code || "NONE"; }
+
+        function updateProductCodeDisplay() {
+            const name = "SEHDS";
+            const adoptableSelectedValue = document.querySelector('input[name="adoptable_status"]:checked')?.value;
+            const depthValue = chamberDepthSelect.value;
+            const flowValue = flowRateInput.value;
+            const spaceValue = spaceSelect.value;
+            const contaminantsCode = getContaminantCode();
+            if (!adoptableSelectedValue || !depthValue || !flowValue || !spaceValue || contaminantsCode === 'NONE') {
+                 productCodeDisplay.textContent='Please complete selections...'; return;
+            }
+            const adoptableCode = adoptableSelectedValue === 'adoptable' ? 'AD' : 'NA';
+            const depthCode = depthValue;
+            const flowCode = flowValue + 'LPS';
+            const spaceCode = spaceValue.substring(0,3).toUpperCase();
+            const contaminantsLetterCode = contaminantsCode;
+            productCodeDisplay.textContent = `${name}-${flowCode}-${spaceCode}-${depthCode}-${contaminantsLetterCode}-${adoptableCode}`;
+        }
+
+        function updateQuoteAndCode() { updateProductCodeDisplay(); updateQuoteDisplay(); }
+
+        const elementsTriggeringUpdates = [ chamberDepthSelect, adoptableStatusGroup, flowRateInput, pipeworkDiameterSelect, spaceSelect, profitMarkupInput ];
+        elementsTriggeringUpdates.forEach(el => { el.addEventListener('change', updateQuoteAndCode); if (el.type === 'number' || el.type === 'text') { el.addEventListener('keyup', updateQuoteAndCode); el.addEventListener('input', updateQuoteAndCode); } });
+        adoptableStatusGroup.addEventListener('change', () => { populateDepthOptions(); });
+        contaminantsGroup.addEventListener('change', updateQuoteAndCode);
+
+        populateDepthOptions(); updateProductCodeDisplay(); updateQuoteDisplay();
+
+        form.addEventListener('submit', function(event) {
+             event.preventDefault(); submitStatus.textContent = 'Submitting...'; submitStatus.className = ''; form.querySelectorAll('.suds-input, .suds-select').forEach(el => el.style.borderColor = ''); adoptableStatusGroup.style.outline = 'none'; contaminantsErrorDiv.textContent = ''; contaminantsGroup.style.outline = 'none'; let isValid = true; const adoptableSelected = form.querySelector('input[name="adoptable_status"]:checked'); if (!adoptableSelected) { isValid = false; adoptableStatusGroup.style.outline = '2px solid var(--suds-red)'; } else { adoptableStatusGroup.style.outline = 'none'; }
+             const selectedContaminants = getSelectedContaminants(); if (selectedContaminants.length === 0) { isValid = false; contaminantsErrorDiv.textContent = 'Please select at least one target contaminant.'; contaminantsGroup.style.outline = '2px solid var(--suds-red)'; } else { contaminantsGroup.style.outline = 'none'; }
+             const requiredStaticFields = form.querySelectorAll('#hds_depth[required], #hds_flow_rate[required], #hds_pipework_diameter[required], #hds_space[required]');
+             requiredStaticFields.forEach(input => { if ((input.tagName === 'SELECT' && input.value === "") || (input.tagName !== 'SELECT' && !input.value.trim())) { isValid = false; input.style.borderColor = 'var(--suds-red)'; } else { input.style.borderColor = ''; } });
+             if (!isValid) { submitStatus.textContent = 'Please fill in all required fields.'; submitStatus.className = 'suds_status_error'; const firstInvalidField = form.querySelector('[style*="border-color: var(--suds-red)"], [style*="outline"]'); if (firstInvalidField) { firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (firstInvalidField.tagName !== 'SELECT' && firstInvalidField.type !== 'radio' && firstInvalidField.type !== 'checkbox' && firstInvalidField.id !== 'contaminants_group') { firstInvalidField.focus();} } return; }
+
+             const payload = buildJsonPayload(); // Get payload before fetch
+
+             // Optional Webhook:
+             // fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(...)
+
+
+             // --- Save to localStorage ---
+             try {
+                 const configToSave = { ...payload };
+                 configToSave.savedId = `suds-hds-${Date.now()}`;
+                 configToSave.savedTimestamp = new Date().toISOString();
+                 // Ensure derived_product_name is set for planner integration
+                 configToSave.derived_product_name = "SEHDS";
+
+
+                 const existingConfigsRaw = localStorage.getItem(savedConfigStorageKey);
+                 let savedConfigs = [];
+                 if (existingConfigsRaw) { try { savedConfigs = JSON.parse(existingConfigsRaw); if (!Array.isArray(savedConfigs)) savedConfigs = []; } catch (e) { console.error("Error parsing existing localStorage data:", e); savedConfigs = []; } }
+
+                 savedConfigs.push(configToSave);
+                 localStorage.setItem(savedConfigStorageKey, JSON.stringify(savedConfigs));
+                 console.log("Separator configuration saved to localStorage.");
+                 submitStatus.textContent = 'Separator configuration saved successfully!';
+                 submitStatus.className = 'suds_status_success';
+             } catch (storageError) {
+                 console.error("Error saving Separator configuration to localStorage:", storageError);
+                 submitStatus.textContent = 'Saving to local storage failed: ' + (storageError.message || 'Unknown error.');
+                 submitStatus.className = 'suds_status_error';
+             }
+            // --- End localStorage Save ---
+
+             form.reset(); populateDepthOptions(); updateProductCodeDisplay(); updateQuoteDisplay();
+        });
+
+        function buildJsonPayload() {
+            const formData = new FormData(form); const quote = calculateQuote(); const costPrice = quote.total; const markupPercent = parseFloat(profitMarkupInput.value) || 0; const sellPrice = costPrice * (1 + markupPercent / 100);
+            const payload = { product_type: "hydrodynamic_separator", adoptable_status: formData.get('adoptable_status'), derived_product_name: "SEHDS", generated_product_code: productCodeDisplay.textContent.startsWith('Please') ? null : productCodeDisplay.textContent, separator_details: { depth_mm: parseFloat(formData.get('hds_depth'))||null, flow_rate_lps: parseFloat(formData.get('hds_flow_rate'))||null, pipework_diameter: formData.get('hds_pipework_diameter'), space_available: formData.get('hds_space'), target_contaminants: getSelectedContaminants() }, quote_details: { items: quote.items, cost_price: costPrice, profit_markup_percent: markupPercent, estimated_sell_price: sellPrice } };
+            return payload;
+        }
+
+    });
+    </script>
+</body>
+</html>

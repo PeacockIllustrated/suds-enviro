@@ -151,6 +151,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }).join('\n\n---\n\n');
         const totalEstimatedSellPrice = configs.reduce((sum, conf) => sum + (conf.quote_details?.estimated_sell_price || 0), 0).toFixed(2);
 
+        
+        
         // Updated System Prompt to use placeholders for customer/project info
         const systemPrompt = `You are an expert technical sales proposal writer for SuDS Enviro, a premier UK-based provider of Sustainable Drainage Systems. Your primary function is to generate comprehensive, client-ready project proposals in well-structured Markdown format.
 
@@ -310,5 +312,36 @@ Website: suds-enviro.com
     window.addEventListener('storage', function(event) {
         if (event.key === savedConfigStorageKey) loadConfigurations();
         if (event.key === userApiKeyStorageKey) loadApiKey();
+
+        
     });
+});
+
+
+// js/main.js (or at the end of existing page-specific scripts)
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const navLinks = document.getElementById('navLinks');
+
+    if (mobileMenuToggle && navLinks) {
+        mobileMenuToggle.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+            mobileMenuToggle.classList.toggle('active');
+            const isExpanded = navLinks.classList.contains('active');
+            mobileMenuToggle.setAttribute('aria-expanded', isExpanded);
+        });
+    }
+
+    // Optional: Close mobile menu if a link is clicked
+    if (navLinks) {
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    mobileMenuToggle.classList.remove('active');
+                    mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+    }
 });

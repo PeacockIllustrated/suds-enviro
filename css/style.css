@@ -7,22 +7,22 @@
     --suds-text-heading: var(--suds-blue);
     --suds-border-light: #d1d5db;
     --suds-bg-light: #f9fafb;
-    --suds-medium-grey: #e9ecef; /* Added from all_configs for consistency */
+    --suds-medium-grey: #e9ecef;
 }
 
-/* --- Existing Navbar and Basic Body Styles --- */
+/* --- Navbar and Basic Body Styles --- */
 body {
     font-family: 'Montserrat', sans-serif;
     margin: 0;
     padding-top: 70px; /* Default for desktop, adjust if navbar height changes */
     background-color: var(--suds-bg-light);
     color: var(--suds-text-dark);
-    line-height: 1.6; /* Added for general body text */
+    line-height: 1.6;
 }
 
 .navbar {
     background-color: #ffffff;
-    padding: 10px 30px;
+    padding: 10px 25px; /* Adjusted padding */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -33,10 +33,19 @@ body {
     width: 100%;
     z-index: 1000;
     box-sizing: border-box;
+    height: 70px; /* Fixed height for navbar */
+}
+
+.nav-logo { /* Updated for image logo */
+    display: flex;
+    align-items: center;
+    height: 100%; /* Make logo container take full navbar height */
 }
 
 .nav-logo img {
-    height: 40px; 
+    height: 40px; /* Adjust based on your logo's aspect ratio */
+    max-height: 80%; /* Ensure it doesn't exceed navbar height too much */
+    width: auto; /* Maintain aspect ratio */
 }
 
 .nav-links {
@@ -44,17 +53,18 @@ body {
     display: flex;
     margin: 0;
     padding: 0;
+    align-items: center; /* Vertically align nav links with logo */
 }
 
 .nav-links li {
-    margin-left: 25px;
+    margin-left: 20px; /* Slightly reduced margin */
 }
 
 .nav-links a {
     text-decoration: none;
     color: var(--suds-text-dark);
     font-weight: 600;
-    font-size: 0.95em;
+    font-size: 0.9em; /* Slightly smaller for more space */
     padding: 8px 12px;
     border-radius: 5px;
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -66,33 +76,46 @@ body {
     color: white;
 }
 
-/* --- Styles moved from all_configs.html --- */
-.container { /* General container for page content below navbar */
+/* --- Styles for all_configs.html and other content pages --- */
+.container { 
     max-width: 1000px;
     margin: 20px auto;
-    padding: 20px;
+    padding: 25px; /* Increased padding */
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.container h1 { /* Page title like "Saved Product Configurations" */
+.page-header-container { /* New container for logo and H1 on all_configs */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.page-logo-main {
+    max-width: 150px; /* Adjust as needed */
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.container h1 { 
     color: var(--suds-blue);
     text-align: center;
-    margin-bottom: 30px;
-    font-size: 2em; /* Consistent H1 size */
+    margin-bottom: 0; /* Removed bottom margin as it's now in page-header-container */
+    font-size: 2em; 
 }
 
 #config-list {
     list-style: none;
     padding: 0;
 }
-#config-list > p { /* Placeholder text when list is empty */
+#config-list > p { 
     text-align: center; 
     color: #666; 
     margin: 20px 0;
 }
-
 
 .config-item {
     background-color: var(--suds-bg-light);
@@ -157,7 +180,7 @@ body {
     background-color: #16699b;
 }
 .config-item pre {
-    background-color: var(--suds-medium-grey); /* Using root variable */
+    background-color: var(--suds-medium-grey); 
     padding: 10px;
     border-radius: 4px;
     font-size: 0.85em;
@@ -197,7 +220,7 @@ body {
 
 .proposal-section {
     margin-top: 30px;
-    padding: 20px;
+    padding: 25px; /* Increased padding */
     border: 1px solid var(--suds-border-light);
     border-radius: 8px;
     background-color: var(--suds-bg-light);
@@ -212,23 +235,22 @@ body {
     margin-bottom: 25px;
 }
 
-/* Using suds-form-group from other forms for consistency */
-.suds-form-group {
-    margin-bottom: 15px; /* Adjusted from 20px for tighter layout in this context */
+.suds-form-group { /* General form group styling from other forms */
+    margin-bottom: 20px;
 }
-.suds-form-group label, /* General label styling within proposal section */
+.suds-form-group label, 
 .proposal-input-group label { 
     display: block;
     font-weight: 600;
-    color: var(--suds-text-dark); /* Darker for better readability */
-    margin-bottom: 6px;
+    color: var(--suds-text-dark); 
+    margin-bottom: 8px; /* Increased margin */
     font-size: 0.95em;
 }
 .proposal-input-group input[type="text"],
 .proposal-input-group textarea,
-#api-key-input { /* Shared style for inputs */
+#api-key-input { 
     width: 100%;
-    padding: 10px 12px;
+    padding: 10px 15px; /* Consistent padding */
     border: 1px solid var(--suds-border-light);
     border-radius: 20px; 
     font-size: 0.95em;   
@@ -244,9 +266,7 @@ body {
 .api-key-group {
     display: flex;
     align-items: center;
-    /* margin-bottom will be handled by parent .suds-form-group */
 }
-/* #api-key-input already styled above */
 #save-api-key-btn {
     padding: 10px 20px; 
     background-color: var(--suds-blue); 
@@ -259,7 +279,7 @@ body {
     font-weight: 600;
     transition: background-color 0.2s, transform 0.2s;
     flex-shrink: 0; 
-    margin-left: 10px; /* Added margin for spacing */
+    margin-left: 10px; 
 }
 #save-api-key-btn:hover {
     background-color: #16699b;
@@ -285,7 +305,6 @@ body {
     line-height: 1.6; 
     overflow-x: auto; 
 }
-/* Styles for HTML rendered from Markdown in the preview */
 #proposal-output h1, #proposal-output h2, #proposal-output h3, #proposal-output h4 {
     color: var(--suds-blue); 
     font-family: 'Montserrat', sans-serif;
@@ -321,16 +340,49 @@ body {
 /* --- Responsive Navbar & Page Specific Overrides --- */
 @media (max-width: 768px) {
     body { 
-        padding-top: 110px; /* Default for taller mobile navbar */
+        padding-top: 115px; /* Increased for potentially taller mobile navbar */
     }
-    /* Specific padding for planner.html body from its own CSS if different */
-    body.page-planner { /* Add class="page-planner" to planner.html body tag */
-         /* padding-top: 110px or specific value from planner's media query */
+    .navbar { /* Adjust mobile navbar */
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 15px; /* Tighter padding */
+        height: auto; /* Allow height to adjust */
     }
-    /* Styles for all_configs.html when on mobile */
+    .nav-logo {
+        margin-bottom: 8px; /* Space below logo */
+        height: 35px; /* Adjust logo height for mobile */
+    }
+    .nav-logo img {
+        height: 35px; 
+        max-height: 100%;
+    }
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+        align-items: flex-start; /* Align links to left */
+    }
+    .nav-links li {
+        margin-left: 0;
+        margin-bottom: 5px;
+        width: 100%;
+    }
+    .nav-links a {
+        display: block; /* Make links full width */
+        padding: 10px 8px; /* Adjust padding */
+        font-size: 0.95em; /* Slightly larger on mobile for tapability */
+        text-align: left;
+    }
+
     .container { 
         padding: 15px; 
     }
+    .container h1 {
+        font-size: 1.6em; /* Adjust H1 for mobile */
+    }
+    .page-logo-main {
+        max-width: 120px; /* Smaller logo on mobile */
+    }
+
     .config-item { 
         flex-direction: column; 
         align-items: flex-start;
@@ -350,11 +402,13 @@ body {
     }
     .action-buttons-container button { 
         display: block; 
-        width: calc(100% - 10px); /* Full width buttons on mobile */
+        width: calc(100% - 10px); 
         margin-left: auto;
         margin-right: auto;
         margin-top: 10px; 
         margin-bottom: 10px;
+        padding: 12px 15px; /* Adjust padding for mobile buttons */
+        font-size: 0.95em;
     }
     .api-key-group {
         flex-direction: column;
@@ -363,14 +417,17 @@ body {
     #api-key-input {
         margin-right: 0;
         margin-bottom: 10px; 
+        font-size: 1em; /* Ensure tap targets are good */
     }
     #save-api-key-btn {
         width: 100%; 
+        font-size: 1em;
+        padding: 12px 15px;
     }
     .proposal-section h2 {
         font-size: 1.4em;
     }
-    /* Ensure proposal action buttons stack nicely */
+    /* Ensure proposal action buttons stack on mobile */
     .proposal-section .action-buttons-container button#generate-proposal-btn,
     .proposal-section .action-buttons-container button#download-proposal-btn {
         display: block;

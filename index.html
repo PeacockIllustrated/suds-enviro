@@ -6,15 +6,13 @@
     <title>SuDS Enviro - Internal Tools Hub</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
+        /* Styles specific to index.html hub page */
+        body.page-hub { /* Add class="page-hub" to body tag */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Align to top */
+            justify-content: flex-start; 
             min-height: 100vh;
-            margin: 0;
-            background-color: #f0f2f5;
         }
         .hub-container {
             background-color: #fff;
@@ -22,17 +20,18 @@
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             text-align: center;
-            margin-top: 20px; /* Space from navbar */
+            margin-top: 30px; /* Space from navbar */
             max-width: 800px;
             width: 90%;
         }
         .hub-container h1 {
             color: var(--suds-blue);
             margin-bottom: 30px;
+            font-size: 2em;
         }
         .tool-links {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjusted minmax */
             gap: 20px;
             list-style: none;
             padding: 0;
@@ -41,16 +40,18 @@
             display: block;
             background-color: var(--suds-green);
             color: white;
-            padding: 15px 20px;
+            padding: 18px 25px; /* Increased padding */
             text-decoration: none;
-            border-radius: 25px;
+            border-radius: 30px; /* More rounded */
             font-weight: 600;
+            font-size: 1.05em; /* Slightly larger font */
             transition: background-color 0.3s ease, transform 0.2s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .tool-links li a:hover {
-            background-color: #4a9d45; /* Darker green */
+            background-color: #4a9d45; 
             transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
          .tool-links li a.planner-link { background-color: var(--suds-blue); }
          .tool-links li a.planner-link:hover { background-color: #16699b; }
@@ -58,15 +59,20 @@
          .tool-links li a.configs-link:hover { background-color: #555; }
     </style>
 </head>
-<body>
+<body class="page-hub"> <!-- Added class for specific body styling -->
     <nav class="navbar">
-        <div class="nav-logo">
-            <img src="https://uploads-ssl.webflow.com/6662e401ea62d861a416088f/6662e78d9725ab79209f1b60_Primary%20Logo%20-%20Colour.svg" alt="SuDS Enviro Logo">
-        </div>
+        <a href="index.html" class="nav-logo">
+            <img src="assets/images/logo_horizontal.svg" alt="SuDS Enviro Logo"> <!-- HORIZONTAL LOGO -->
+        </a>
         <ul class="nav-links">
             <li><a href="index.html" class="active">Tools Hub</a></li>
             <li><a href="planner.html">Drainage Planner</a></li>
             <li><a href="all_configs.html">Saved Configurations</a></li>
+            <!-- Add links to other configurator pages here for full navigation -->
+            <li><a href="catchpit.html">Catchpit Config</a></li>
+            <li><a href="orifice.html">Orifice Config</a></li>
+            <li><a href="universal_chamber.html">Chamber Config</a></li>
+            <li><a href="separator.html">Separator Config</a></li>
         </ul>
     </nav>
 

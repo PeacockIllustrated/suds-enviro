@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuDS Enviro - Saved Configurations</title>
+    <title>SuDS Enviro - Saved Configurations & Proposal</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         body {
@@ -87,11 +87,15 @@
             width: 100%;
             box-sizing: border-box;
         }
-        #export-configs-btn, #clear-all-configs-btn {
+        
+        .action-buttons-container { /* For centering buttons */
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .action-buttons-container button {
             display: inline-block; 
-            margin: 20px 10px 20px 0; 
+            margin: 5px; 
             padding: 12px 25px;
-            background-color: var(--suds-green);
             color: white;
             border: none;
             border-radius: 25px;
@@ -99,18 +103,55 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        #clear-all-configs-btn {
-            background-color: var(--suds-red);
+        #export-configs-btn { background-color: var(--suds-blue); }
+        #export-configs-btn:hover { background-color: #16699b; }
+        #clear-all-configs-btn { background-color: var(--suds-red); }
+        #clear-all-configs-btn:hover { background-color: #a53c3a;}
+
+        .proposal-section {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid var(--suds-border-light);
+            border-radius: 8px;
+            background-color: var(--suds-bg-light);
         }
-        #export-configs-btn:hover {
+        .proposal-section h2 {
+            color: var(--suds-text-heading);
+            margin-top: 0;
+            border-bottom: 1px solid var(--suds-blue);
+            padding-bottom: 10px;
+        }
+        #api-key-input {
+            width: calc(100% - 24px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--suds-border-light);
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+        #generate-proposal-btn {
+            background-color: var(--suds-green);
+        }
+        #generate-proposal-btn:hover {
             background-color: #4a9d45;
         }
-        #clear-all-configs-btn:hover {
-            background-color: #a53c3a;
+        #proposal-output {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid var(--suds-border-light);
+            border-radius: 5px;
+            white-space: pre-wrap; /* To preserve formatting from AI */
+            min-height: 100px;
+            font-family: monospace;
+            font-size: 0.9em;
         }
-        .buttons-container { 
-            text-align: center;
+        #proposal-status {
+            margin-top: 10px;
+            font-style: italic;
+            color: var(--suds-text-dark);
         }
+
 
          @media (max-width: 768px) {
             body { padding-top: 110px; } 
@@ -118,7 +159,7 @@
             .config-item-actions { margin-top: 10px; width: 100%; display: flex; }
             .config-item-actions button { flex-grow: 1; margin-left: 0; margin-right: 5px;}
             .config-item-actions button:last-child { margin-right: 0;}
-            #export-configs-btn, #clear-all-configs-btn { display: block; margin: 10px auto; }
+            .action-buttons-container button { display: block; margin: 10px auto; }
         }
     </style>
 </head>
@@ -136,13 +177,28 @@
 
     <div class="container">
         <h1>Saved Product Configurations</h1>
-        <div class="buttons-container">
+        <div class="action-buttons-container">
             <button id="export-configs-btn">Export All Configurations (JSON)</button>
             <button id="clear-all-configs-btn">Clear All Saved Configurations</button>
         </div>
         <ul id="config-list">
             <p>No configurations found in local storage, or they are being loaded...</p>
         </ul>
+
+        <div class="proposal-section">
+            <h2>Generate Project Proposal</h2>
+            <div class="suds-form-group">
+                <label for="api-key-input" class="suds-label" style="color: var(--suds-text-dark);">AI API Key:</label>
+                <input type="password" id="api-key-input" placeholder="Enter your AI API Key here">
+            </div>
+            <div class="action-buttons-container">
+                <button id="generate-proposal-btn">Generate Proposal from All Saved Configurations</button>
+            </div>
+            <div id="proposal-status"></div>
+            <div id="proposal-output">
+                Proposal will appear here...
+            </div>
+        </div>
     </div>
 
     <script src="js/all_configs.js"></script>

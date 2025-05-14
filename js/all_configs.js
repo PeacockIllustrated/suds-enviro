@@ -9,24 +9,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const generateProposalButton = document.getElementById('generate-proposal-btn');
     const proposalOutputDiv = document.getElementById('proposal-output');
     const proposalStatusDiv = document.getElementById('proposal-status');
-    const copyMarkdownButton = document.getElementById('copy-markdown-btn'); // New button
+    const downloadMarkdownButton = document.getElementById('download-markdown-btn'); 
 
     const savedConfigStorageKey = 'sudsSavedConfigs';
-    const userApiKeyStorageKey = 'sudsUserOpenAiApiKey';
+    const userApiKeyStorageKey = 'sudsUserOpenAiApiKey'; 
 
     let userProvidedApiKey = '';
 
-    function loadApiKey() { /* ... (same as before) ... */
+    function loadApiKey() {
         const storedKey = localStorage.getItem(userApiKeyStorageKey);
         if (storedKey) {
             userProvidedApiKey = storedKey;
-            apiKeyInput.value = userProvidedApiKey;
+            if(apiKeyInput) apiKeyInput.value = userProvidedApiKey; 
         }
     }
 
-    function saveUserApiKey() { /* ... (same as before) ... */
+    function saveUserApiKey() {
+        if(!apiKeyInput) return;
         const newKey = apiKeyInput.value.trim();
-        if (newKey && (newKey.startsWith('sk-') || newKey.startsWith('sk-proj-'))) {
+        if (newKey && (newKey.startsWith('sk-') || newKey.startsWith('sk-proj-'))) { 
             localStorage.setItem(userApiKeyStorageKey, newKey);
             userProvidedApiKey = newKey;
             alert('API Key saved successfully!');
@@ -43,78 +44,143 @@ document.addEventListener('DOMContentLoaded', function() {
         saveApiKeyButton.addEventListener('click', saveUserApiKey);
     }
 
-    // --- Configuration Loading and Management (same as before) ---
-    function loadConfigurations() { /* ... (same as before, ensure generateProposalButton.disabled and copyMarkdownButton.style.display are managed) ... */
-        configList.innerHTML = '';
+    function loadConfigurations() {
+        if (!configList) return;
+        configList.innerHTML = ''; 
         const storedData = localStorage.getItem(savedConfigStorageKey);
         let configs = [];
 
         if (storedData) {
-            try { configs = JSON.parse(storedData); if (!Array.isArray(configs)) configs = []; }
-            catch (e) { console.error("Error parsing saved configurations:", e); configList.innerHTML = '<p>Error loading configurations.</p>'; return; }
+            try {
+                configs = JSON.parse(storedData);
+                if (!Array.isArray(configs)) configs = [];
+            } catch (e) {
+                console.error("Error parsing saved configurations:", e);
+                configList.innerHTML = '<p style="text-align: center; color: #666; margin: 20px 0;">Error loading configurations. Data might be corrupted.</p>';
+                return;
+            }
         }
 
         if (configs.length === 0) {
-            configList.innerHTML = '<p>No product configurations saved yet.</p>';
+            configList.innerHTML = '<p style="text-align: center; color: #666; margin: 20px 0;">No product configurations saved yet. Use the configurator tools to save some!</p>';
             if(exportButton) exportButton.style.display = 'none';
             if(clearAllButton) clearAllButton.style.display = 'none';
             if(generateProposalButton) generateProposalButton.disabled = true;
-            if(copyMarkdownButton) copyMarkdownButton.style.display = 'none'; // Hide copy button
+            if(downloadMarkdownButton) downloadMarkdownButton.style.display = 'none';
             return;
         }
         if(exportButton) exportButton.style.display = 'inline-block';
         if(clearAllButton) clearAllButton.style.display = 'inline-block';
         if(generateProposalButton) generateProposalButton.disabled = false;
-        // Copy button visibility will be handled after proposal generation
 
-        configs.forEach((config, index) => { /* ... (same as before) ... */
+
+        configs.forEach((config, index) => {
             const listItem = document.createElement('li');
             listItem.className = 'config-item';
             listItem.dataset.index = index;
+
             const detailsDiv = document.createElement('div');
             detailsDiv.className = 'config-item-details';
+
             const nameStrong = document.createElement('strong');
             nameStrong.textContent = config.derived_product_name || config.product_type || 'Unnamed Configuration';
             detailsDiv.appendChild(nameStrong);
-            if (config.generated_product_code) { const codeP = document.createElement('p'); codeP.textContent = `Product Code: ${config.generated_product_code}`; detailsDiv.appendChild(codeP); }
-            if (config.savedTimestamp) { const timeP = document.createElement('p'); timeP.className = 'timestamp'; timeP.textContent = `Saved: ${new Date(config.savedTimestamp).toLocaleString()}`; detailsDiv.appendChild(timeP); }
-            if (config.savedId) { const idSP = document.createElement('p'); idSP.className = 'timestamp'; idSP.textContent = `Saved ID: ${config.savedId}`; detailsDiv.appendChild(idSP); }
+
+            if (config.generated_product_code) {
+                const codeP = document.createElement('p');
+                codeP.textContent = `Product Code: ${config.generated_product_code}`;
+                detailsDiv.appendChild(codeP);
+            }
+            if (config.savedTimestamp) {
+                const timeP = document.createElement('p');
+                timeP.className = 'timestamp';
+                timeP.textContent = `Saved: ${new Date(config.savedTimestamp).toLocaleString()}`;
+                detailsDiv.appendChild(timeP);
+            }
+            if (config.savedId) {
+                const idSP = document.createElement('p');
+                idSP.className = 'timestamp';
+                idSP.textContent = `Saved ID: ${config.savedId}`;
+                detailsDiv.appendChild(idSP);
+            }
+
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'config-item-actions';
-            const viewDetailsButton = document.createElement('button'); viewDetailsButton.textContent = 'View Details'; viewDetailsButton.className = 'view-details-btn';
-            viewDetailsButton.onclick = function() { const pre = listItem.querySelector('pre'); if (pre) pre.style.display = pre.style.display === 'none' ? 'block' : 'none'; };
-            const deleteButton = document.createElement('button'); deleteButton.textContent = 'Delete';
-            deleteButton.onclick = function() { if (confirm('Are you sure you want to delete this configuration?')) { deleteConfiguration(index); } };
-            actionsDiv.appendChild(viewDetailsButton); actionsDiv.appendChild(deleteButton);
-            const detailsPre = document.createElement('pre'); detailsPre.textContent = JSON.stringify(config, null, 2);
-            listItem.appendChild(detailsDiv); listItem.appendChild(actionsDiv); listItem.appendChild(detailsPre);
+
+            const viewDetailsButton = document.createElement('button');
+            viewDetailsButton.textContent = 'View Details';
+            viewDetailsButton.className = 'view-details-btn';
+            viewDetailsButton.onclick = function() {
+                const pre = listItem.querySelector('pre');
+                if (pre) pre.style.display = pre.style.display === 'none' ? 'block' : 'none';
+            };
+            
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.onclick = function() {
+                if (confirm('Are you sure you want to delete this configuration?')) {
+                    deleteConfiguration(index);
+                }
+            };
+
+            actionsDiv.appendChild(viewDetailsButton);
+            actionsDiv.appendChild(deleteButton);
+            
+            const detailsPre = document.createElement('pre');
+            detailsPre.textContent = JSON.stringify(config, null, 2);
+            
+            listItem.appendChild(detailsDiv);
+            listItem.appendChild(actionsDiv);
+            listItem.appendChild(detailsPre);
             configList.appendChild(listItem);
         });
     }
 
-    function deleteConfiguration(indexToDelete) { /* ... (same as before) ... */
+    function deleteConfiguration(indexToDelete) {
         const storedData = localStorage.getItem(savedConfigStorageKey);
         let configs = [];
-        if (storedData) { try { configs = JSON.parse(storedData); if (!Array.isArray(configs)) configs = []; } catch (e) { /* Do nothing */ } }
-        configs.splice(indexToDelete, 1); localStorage.setItem(savedConfigStorageKey, JSON.stringify(configs)); loadConfigurations();
+        if (storedData) {
+            try { configs = JSON.parse(storedData); if (!Array.isArray(configs)) configs = []; } catch (e) { /* Do nothing */ }
+        }
+        configs.splice(indexToDelete, 1);
+        localStorage.setItem(savedConfigStorageKey, JSON.stringify(configs));
+        loadConfigurations();
     }
 
-    if(exportButton) exportButton.addEventListener('click', function() { /* ... (same as before) ... */ });
-    if(clearAllButton) clearAllButton.addEventListener('click', function() { /* ... (same as before) ... */ });
-    // --- End Configuration Loading and Management ---
+    if(exportButton) exportButton.addEventListener('click', function() {
+        const storedData = localStorage.getItem(savedConfigStorageKey);
+        if (!storedData) { alert('No configurations to export.'); return; }
+        try {
+            const configs = JSON.parse(storedData);
+            if (!Array.isArray(configs) || configs.length === 0) { alert('No configurations to export.'); return; }
+            const jsonData = JSON.stringify(configs, null, 2);
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'suds_enviro_all_configurations.json';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch(e) { alert('Error exporting configurations.'); console.error("Export error:", e); }
+    });
 
+    if(clearAllButton) clearAllButton.addEventListener('click', function() {
+        if (confirm('Are you sure you want to delete ALL saved product configurations? This action cannot be undone.')) {
+            localStorage.removeItem(savedConfigStorageKey);
+            loadConfigurations();
+            alert('All saved configurations have been cleared.');
+        }
+    });
 
-    // --- Proposal Generation ---
     if(generateProposalButton) generateProposalButton.addEventListener('click', async function() {
-        const apiKey = apiKeyInput.value.trim();
+        const apiKey = apiKeyInput.value.trim(); 
         if (!apiKey) {
             alert('Please enter your OpenAI API Key in the input field.');
-            apiKeyInput.focus();
+            if(apiKeyInput) apiKeyInput.focus();
             return;
         }
         if (apiKey.startsWith('sk-') || apiKey.startsWith('sk-proj-')) {
             localStorage.setItem(userApiKeyStorageKey, apiKey);
-            userProvidedApiKey = apiKey;
+            userProvidedApiKey = apiKey; 
         } else {
             alert('The entered API Key does not look like a valid OpenAI key. Please check and try again.');
             return;
@@ -129,9 +195,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!Array.isArray(configs) || configs.length === 0) { alert('No configurations to generate a proposal from.'); return; }
         } catch (e) { alert('Could not read saved configurations. Data might be corrupted.'); return; }
 
-        proposalStatusDiv.textContent = 'Generating proposal... Please wait.';
-        proposalOutputDiv.innerHTML = ''; // Clear previous proposal
-        if(copyMarkdownButton) copyMarkdownButton.style.display = 'none'; // Hide copy button initially
+        if(proposalStatusDiv) proposalStatusDiv.textContent = 'Generating proposal... Please wait.';
+        if(proposalOutputDiv) proposalOutputDiv.textContent = ''; 
+        if(downloadMarkdownButton) downloadMarkdownButton.style.display = 'none'; 
         generateProposalButton.disabled = true;
 
         const configurationsDetails = configs.map(config => {
@@ -144,13 +210,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 details += `  * Pipework Diameter: ${config.catchpit_details.pipework_diameter || 'N/A'}\n`;
                 details += `  * Target Pollutant: ${config.catchpit_details.target_pollutant || 'N/A'}\n`;
                 details += `  * Removable Bucket: ${config.catchpit_details.removable_bucket ? 'Yes' : 'No'}\n`;
-            } else if (config.chamber_details && config.flow_control_params) { // Orifice
+            } else if (config.chamber_details && config.flow_control_params) { 
                 details += `  * Chamber Depth: ${config.chamber_details.chamber_depth_mm || 'N/A'}mm\n`;
                 details += `  * Chamber Diameter: ${config.chamber_details.chamber_diameter || 'N/A'}\n`;
                 details += `  * Target Flow Rate: ${config.flow_control_params.target_flow_lps || 'N/A'} L/s\n`;
                 details += `  * Design Head Height: ${config.flow_control_params.design_head_m || 'N/A'} m\n`;
                 details += `  * Bypass Required: ${config.flow_control_params.bypass_required ? 'Yes' : 'No'}\n`;
-            } else if (config.main_chamber && config.inlets) { // Universal Chamber
+            } else if (config.main_chamber && config.inlets) { 
                 details += `  * System Type: ${config.system_type_selection || 'N/A'}\n`;
                 details += `  * Water Application: ${config.water_application_selection || 'N/A'}\n`;
                 details += `  * Chamber Depth: ${config.main_chamber.chamber_depth_mm || 'N/A'}mm\n`;
@@ -159,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 config.inlets.forEach(inlet => {
                     details += `    * Position: ${inlet.position}, Size: ${inlet.pipe_size || 'N/A'}, Material: ${inlet.pipe_material || 'N/A'} ${inlet.pipe_material_other ? `(${inlet.pipe_material_other})` : ''}\n`;
                 });
-            } else if (config.separator_details) { // Separator
+            } else if (config.separator_details) { 
                 details += `  * Depth: ${config.separator_details.depth_mm || 'N/A'}mm\n`;
                 details += `  * Design Flow Rate: ${config.separator_details.flow_rate_lps || 'N/A'} L/s\n`;
                 details += `  * Pipework Diameter: ${config.separator_details.pipework_diameter || 'N/A'}\n`;
@@ -171,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
                  details += `  * **Estimated Sell Price:** £${config.quote_details.estimated_sell_price.toFixed(2)}\n`;
             }
             return details;
-        }).join('\n\n---\n\n'); // Separator for products in Markdown
+        }).join('\n\n---\n\n');
 
         const totalEstimatedSellPrice = configs.reduce((sum, conf) => sum + (conf.quote_details?.estimated_sell_price || 0), 0).toFixed(2);
 
@@ -250,12 +316,11 @@ Website: www.sudsenviro.co.uk (Please replace with actual URL)
 **Configured Product Data:**
 ${configurationsDetails}
 `;
-
         const aiApiEndpoint = 'https://api.openai.com/v1/chat/completions';
         
         try {
             const requestBody = {
-                model: "gpt-4o", // Strongly recommend GPT-4o or GPT-4 Turbo for this level of detail
+                model: "gpt-4o", 
                 messages: [
                     { "role": "system", "content": systemPrompt },
                     { "role": "user", "content": userQuery }
@@ -279,35 +344,40 @@ ${configurationsDetails}
             const data = await response.json();
             const proposalMarkdown = data.choices?.[0]?.message?.content || "Could not extract proposal text from API response.";
             
-            proposalOutputDiv.textContent = proposalMarkdown; // Display raw Markdown
-            proposalStatusDiv.textContent = 'Proposal generated successfully! (Markdown Format)';
-            if(copyMarkdownButton) copyMarkdownButton.style.display = 'inline-block'; // Show copy button
+            if(proposalOutputDiv) proposalOutputDiv.textContent = proposalMarkdown; 
+            if(proposalStatusDiv) proposalStatusDiv.textContent = 'Proposal generated successfully! (Markdown Format)';
+            if(downloadMarkdownButton) downloadMarkdownButton.style.display = 'inline-block';
 
         } catch (error) {
             console.error('Error generating proposal:', error);
-            proposalOutputDiv.textContent = `Error generating proposal. Please check the console for details.\nMessage: ${error.message}`;
-            proposalStatusDiv.textContent = 'Proposal generation failed.';
+            if(proposalOutputDiv) proposalOutputDiv.textContent = `Error generating proposal. Please check the console for details.\nMessage: ${error.message}`;
+            if(proposalStatusDiv) proposalStatusDiv.textContent = 'Proposal generation failed.';
         } finally {
-            generateProposalButton.disabled = false;
+            if(generateProposalButton) generateProposalButton.disabled = false;
         }
     });
 
-    if(copyMarkdownButton) copyMarkdownButton.addEventListener('click', function() {
-        if (proposalOutputDiv.textContent) {
-            navigator.clipboard.writeText(proposalOutputDiv.textContent)
-                .then(() => {
-                    alert('Proposal Markdown copied to clipboard!');
-                })
-                .catch(err => {
-                    console.error('Failed to copy markdown: ', err);
-                    alert('Failed to copy markdown. Please select and copy manually.');
-                });
+    if(downloadMarkdownButton) downloadMarkdownButton.addEventListener('click', function() {
+        if (!proposalOutputDiv) return;
+        const markdownContent = proposalOutputDiv.textContent;
+        if (markdownContent && markdownContent !== "Proposal will appear here once generated..." && !markdownContent.startsWith("Error generating proposal")) {
+            const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
+            const today = new Date();
+            const dateString = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+            const filename = `SuDS_Enviro_Proposal_${dateString}.md`;
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
         } else {
-            alert('No proposal content to copy.');
+            alert('No proposal content generated or an error occurred. Please generate a proposal first.');
         }
     });
 
-    // Initial load
     loadApiKey(); 
     loadConfigurations();
 

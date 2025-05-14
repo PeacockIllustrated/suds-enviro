@@ -9,6 +9,8 @@
         body {
             padding-top: 80px; /* Default for desktop */
             font-family: 'Montserrat', sans-serif;
+            background-color: var(--suds-bg-light); /* Ensure body background matches theme */
+            color: var(--suds-text-dark);
         }
         .container {
             max-width: 1000px;
@@ -41,12 +43,12 @@
         }
         .config-item-details {
             flex-grow: 1;
-            margin-right: 10px; /* Space between details and actions */
+            margin-right: 10px; 
         }
         .config-item strong {
             color: var(--suds-text-heading);
             font-size: 1.1em;
-            display: block; /* Ensure it takes full width before other p tags */
+            display: block; 
             margin-bottom: 3px;
         }
         .config-item p {
@@ -58,6 +60,10 @@
             font-size: 0.8em;
             color: #777;
         }
+        .config-item-actions {
+            display: flex; /* Align buttons in a row */
+            flex-shrink: 0; /* Prevent actions from shrinking too much */
+        }
         .config-item-actions button {
             background-color: var(--suds-red);
             color: white;
@@ -67,10 +73,10 @@
             cursor: pointer;
             font-size: 0.9em;
             transition: background-color 0.2s;
-            margin-left: 10px; /* Spacing between action buttons */
+            margin-left: 10px; 
         }
         .config-item-actions button:first-child {
-            margin-left: 0; /* No left margin for the first button */
+            margin-left: 0; 
         }
         .config-item-actions button:hover {
             background-color: #a53c3a;
@@ -89,7 +95,7 @@
             white-space: pre-wrap;
             word-break: break-all;
             margin-top: 10px;
-            display: none; /* Hidden by default */
+            display: none; 
             width: 100%;
             box-sizing: border-box;
         }
@@ -98,7 +104,7 @@
             text-align: center;
             margin-bottom: 20px;
         }
-        .action-buttons-container button {
+        .action-buttons-container button { /* General style for buttons in this container */
             display: inline-block; 
             margin: 5px; 
             padding: 12px 25px;
@@ -107,8 +113,14 @@
             border-radius: 25px;
             font-size: 1em;
             cursor: pointer;
-            transition: background-color 0.3s;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
         }
+        .action-buttons-container button:hover {
+            transform: translateY(-1px);
+        }
+
         #export-configs-btn { background-color: var(--suds-blue); }
         #export-configs-btn:hover { background-color: #16699b; }
         #clear-all-configs-btn { background-color: var(--suds-red); }
@@ -126,7 +138,9 @@
             margin-top: 0;
             border-bottom: 1px solid var(--suds-blue);
             padding-bottom: 10px;
-            font-size: 1.4em; /* Match other H3 styling */
+            font-size: 1.6em; /* Slightly larger heading for this section */
+            text-align: center;
+            margin-bottom: 20px;
         }
         .api-key-group {
             display: flex;
@@ -134,36 +148,47 @@
             margin-bottom: 15px;
         }
         #api-key-input {
-            flex-grow: 1; /* Allow input to take available space */
+            flex-grow: 1; 
             padding: 10px 12px;
             border: 1px solid var(--suds-border-light);
-            border-radius: 5px;
-            font-size: 0.9em;
+            border-radius: 20px; /* Match other inputs */
+            font-size: 0.95em;   /* Match other inputs */
             font-family: 'Montserrat', sans-serif;
-            margin-right: 10px; /* Space before save button */
+            margin-right: 10px; 
+            box-sizing: border-box;
         }
         #save-api-key-btn {
-            padding: 10px 18px; 
+            padding: 10px 20px; 
             background-color: var(--suds-blue); 
             color:white; 
             border:none; 
-            border-radius:5px; 
+            border-radius:20px; /* Match other buttons */
             cursor:pointer;
-            font-size: 0.9em;
+            font-size: 0.95em; /* Match other buttons */
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, transform 0.2s;
         }
         #save-api-key-btn:hover {
             background-color: #16699b;
+            transform: translateY(-1px);
         }
 
-        #generate-proposal-btn { /* Already styled by .action-buttons-container button */
+        /* Specific styling for generate and copy proposal buttons */
+        #generate-proposal-btn { 
             background-color: var(--suds-green);
         }
         #generate-proposal-btn:hover {
             background-color: #4a9d45;
         }
+        #copy-markdown-btn {
+            background-color: var(--suds-text-dark); 
+            margin-left: 10px; 
+        }
+        #copy-markdown-btn:hover {
+            background-color: #555;
+        }
+
         #proposal-output {
             margin-top: 20px;
             padding: 15px;
@@ -171,16 +196,18 @@
             border: 1px solid var(--suds-border-light);
             border-radius: 5px;
             white-space: pre-wrap; 
-            min-height: 100px;
-            font-family: monospace; /* Good for pre-formatted text */
+            min-height: 200px; /* Increased height */
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace; /* Common monospaced fonts */
             font-size: 0.9em;
-            line-height: 1.4;
+            line-height: 1.5; /* Improved readability */
+            overflow-x: auto; /* Allow horizontal scroll if content is too wide */
         }
         #proposal-status {
-            margin-top: 10px;
+            margin-top: 15px; /* Increased margin */
             font-style: italic;
             color: var(--suds-text-dark);
             text-align: center;
+            font-weight: 500; /* Slightly bolder */
         }
 
 
@@ -209,11 +236,17 @@
             }
             .api-key-group {
                 flex-direction: column;
-                align-items: stretch; /* Make input and button full width */
+                align-items: stretch; 
             }
             #api-key-input {
                 margin-right: 0;
-                margin-bottom: 10px; /* Space between input and button on mobile */
+                margin-bottom: 10px; 
+            }
+            #save-api-key-btn {
+                width: 100%; /* Full width on mobile */
+            }
+            .proposal-section h2 {
+                font-size: 1.4em;
             }
         }
     </style>
@@ -237,13 +270,13 @@
             <button id="clear-all-configs-btn">Clear All Saved Configurations</button>
         </div>
         <ul id="config-list">
-            <p>No configurations found in local storage, or they are being loaded...</p>
+            <p style="text-align: center; color: #666; margin: 20px 0;">Loading configurations or no configurations saved yet...</p>
         </ul>
 
         <div class="proposal-section">
             <h2>Generate Project Proposal</h2>
-            <div class="suds-form-group"> <!-- Using suds-form-group for consistent spacing -->
-                <label for="api-key-input" class="suds-label" style="color: var(--suds-text-dark); font-weight: 600;">AI API Key (e.g., OpenAI):</label>
+            <div class="suds-form-group"> 
+                <label for="api-key-input" class="suds-label" style="color: var(--suds-text-dark); font-weight: 600; margin-bottom: 8px;">AI API Key (e.g., OpenAI):</label>
                 <div class="api-key-group">
                     <input type="password" id="api-key-input" placeholder="Enter your AI API Key here">
                     <button id="save-api-key-btn">Save Key</button> 
@@ -251,17 +284,18 @@
             </div>
             <div class="action-buttons-container">
                 <button id="generate-proposal-btn">Generate Proposal from All Saved Configurations</button>
+                <button id="copy-markdown-btn" style="display: none;">Copy Proposal Markdown</button> 
             </div>
             <div id="proposal-status"></div>
             <div id="proposal-output">
-                Proposal will appear here...
+                Proposal will appear here once generated...
             </div>
         </div>
     </div>
 
     <script src="js/all_configs.js"></script>
-    <!-- If using Markdown rendering for proposal:
+    <!-- Optional: If you want to try client-side Markdown to HTML rendering for display in the proposalOutputDiv -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> 
-    -->
+   
 </body>
 </html>

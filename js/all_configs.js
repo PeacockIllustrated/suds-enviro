@@ -1,5 +1,6 @@
 // js/all_configs.js
 document.addEventListener('DOMContentLoaded', function() {
+    // ... (all other const declarations and existing functions like loadApiKey, saveUserApiKey, etc. remain the same) ...
     const configList = document.getElementById('config-list');
     const projectSelectDropdown = document.getElementById('project-select');
     const exportProjectButton = document.getElementById('export-project-configs-btn');
@@ -13,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const apiKeyInput = document.getElementById('api-key-input');
     const saveApiKeyButton = document.getElementById('save-api-key-btn');
     const generateProposalButton = document.getElementById('generate-proposal-btn');
-    const copyMarkdownButton = document.getElementById('copy-markdown-btn'); // NEW
+    const copyMarkdownButton = document.getElementById('copy-markdown-btn');
     const downloadProposalButton = document.getElementById('download-proposal-btn');
     const proposalOutputDiv = document.getElementById('proposal-output');
     const proposalStatusDiv = document.getElementById('proposal-status');
@@ -22,31 +23,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const userApiKeyStorageKey = 'sudsUserOpenAiApiKey';
     const DEFAULT_PROJECT_NAME = "_DEFAULT_PROJECT_";
 
-    let userProvidedApiKey = '';
+    let userProvidedApiKey = ''; // This is loaded by loadApiKey() from localStorage
     let rawMarkdownForDownload = '';
     let currentProjectsData = {};
 
-    function loadApiKey() { /* ... no change ... */
+    function loadApiKey() {
         const storedKey = localStorage.getItem(userApiKeyStorageKey);
         if (storedKey) {
             userProvidedApiKey = storedKey;
             if (apiKeyInput) apiKeyInput.value = userProvidedApiKey;
+        } else {
+            userProvidedApiKey = ''; // Ensure it's explicitly empty if nothing in storage
         }
     }
 
-    function saveUserApiKey() { /* ... no change ... */
+    function saveUserApiKey() {
         if (!apiKeyInput) return;
         const newKey = apiKeyInput.value.trim();
         if (newKey && (newKey.startsWith('sk-') || newKey.startsWith('sk-proj-'))) {
-            localStorage.setItem(userApiKeyStorageKey, newKey);
-            userProvidedApiKey = newKey;
-            alert('API Key saved successfully!');
+            if (newKey.length > 20) { // Basic length check for a real key
+                localStorage.setItem(userApiKeyStorageKey, newKey);
+                userProvidedApiKey = newKey; // Update the module-scoped variable
+                alert('API Key saved successfully!');
+            } else {
+                alert('API Key appears too short to be valid.');
+            }
         } else if (newKey === "") {
             localStorage.removeItem(userApiKeyStorageKey);
             userProvidedApiKey = "";
             alert('API Key cleared.');
         } else {
-            alert('Invalid API Key format. Please enter a valid key (e.g., starting with "sk-").');
+            alert('Invalid API Key format. Please enter a valid key (e.g., starting with "sk-") and ensure it is of a reasonable length.');
         }
     }
 
@@ -54,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
         saveApiKeyButton.addEventListener('click', saveUserApiKey);
     }
 
+    // ... (populateProjectSelector, displayConfigurationsForSelectedProject, loadInitialData, deleteConfiguration, export, clear buttons - all remain the same as your last working version) ...
     function populateProjectSelector() { /* ... no change ... */
         projectSelectDropdown.innerHTML = '<option value="">-- Select a Project --</option>';
         const projectNames = Object.keys(currentProjectsData);
@@ -71,14 +79,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function displayConfigurationsForSelectedProject() { /* ... no change (ensure copyMarkdownButton is hidden initially here too) ... */
+    function displayConfigurationsForSelectedProject() { /* ... no change ... */
         const selectedProjectName = projectSelectDropdown.value;
         configList.innerHTML = '';
-
-        if (copyMarkdownButton) copyMarkdownButton.style.display = 'none'; // Hide on project change
-        if (downloadProposalButton) downloadProposalButton.style.display = 'none'; // Hide on project change
-
-
+        if (copyMarkdownButton) copyMarkdownButton.style.display = 'none';
+        if (downloadProposalButton) downloadProposalButton.style.display = 'none';
         if (!selectedProjectName || !currentProjectsData[selectedProjectName]) {
             configList.innerHTML = '<p style="text-align: center; color: #666; margin: 20px 0;">Please select a project to view its configurations.</p>';
             if (exportProjectButton) exportProjectButton.disabled = true;
@@ -98,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (exportProjectButton) exportProjectButton.disabled = false;
             if (clearProjectButton) clearProjectButton.disabled = false;
             if (generateProposalButton) generateProposalButton.disabled = false;
-            configs.forEach((config, index) => { /* ... list item rendering ... */
+            configs.forEach((config, index) => {
                 const listItem = document.createElement('li'); listItem.className = 'config-item';
                 listItem.dataset.projectName = selectedProjectName; listItem.dataset.index = index;
                 const detailsDiv = document.createElement('div'); detailsDiv.className = 'config-item-details';
@@ -165,9 +170,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (clearProjectButton) { /* ... no change ... */
         clearProjectButton.addEventListener('click', function() {
             const selectedProjectName = projectSelectDropdown.value;
-            if (!selectedProjectName) { alert('Please select a project to clear.'); return; } // Allow clearing even if project array is empty but key exists
+            if (!selectedProjectName) { alert('Please select a project to clear.'); return; }
             if (confirm(`Are you sure you want to delete ALL configurations for project "${selectedProjectName}"? This cannot be undone.`)) {
-                if (currentProjectsData[selectedProjectName]) { // Check if project actually exists
+                if (currentProjectsData[selectedProjectName]) {
                     if (selectedProjectName === DEFAULT_PROJECT_NAME) { currentProjectsData[DEFAULT_PROJECT_NAME] = []; }
                     else { delete currentProjectsData[selectedProjectName]; }
                     localStorage.setItem(projectDataStorageKey, JSON.stringify(currentProjectsData));
@@ -189,33 +194,63 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+
     if (generateProposalButton) {
         generateProposalButton.addEventListener('click', async function() {
             const selectedProjectName = projectSelectDropdown.value;
-            const apiKey = apiKeyInput.value.trim();
 
-            // Initial UI setup for generation
             if (proposalStatusDiv) proposalStatusDiv.textContent = 'Preparing to generate...';
             if (proposalOutputDiv) proposalOutputDiv.innerHTML = '';
             if (downloadProposalButton) downloadProposalButton.style.display = 'none';
-            if (copyMarkdownButton) copyMarkdownButton.style.display = 'none'; // Hide copy button initially
-            // generateProposalButton.disabled = true; // Disabled at the end of try/finally
+            if (copyMarkdownButton) copyMarkdownButton.style.display = 'none';
+            generateProposalButton.disabled = true; // Disable button during processing
 
-            if (!selectedProjectName) { /* ... (validation - no change) ... */ alert('Please select a project...'); return;}
-            if (!apiKey) { /* ... (validation - no change) ... */ alert('Please enter API key...'); return;}
-            // ... (API key format validation - no change) ...
+            // --- REFINED API KEY HANDLING ---
+            let keyForApiCall = apiKeyInput.value.trim(); // Get key from input field
+
+            if (!keyForApiCall) { // If input is empty, try to use the one loaded from storage
+                keyForApiCall = userProvidedApiKey; // userProvidedApiKey is from loadApiKey()
+            }
+
+            // Validate the key to be used
+            if (!keyForApiCall || !(keyForApiCall.startsWith('sk-') || keyForApiCall.startsWith('sk-proj-')) || keyForApiCall.length < 20) {
+                alert('A valid OpenAI API Key is required. Please enter it in the field, ensure it starts with "sk-" or "sk-proj-", is of sufficient length, and save it if needed.');
+                if (apiKeyInput) apiKeyInput.focus();
+                generateProposalButton.disabled = false; // Re-enable button
+                return;
+            }
+
+            // If the key used came from the input field and is different from the (potentially outdated) module-scoped userProvidedApiKey,
+            // and it's valid, update the module-scoped variable and localStorage.
+            // This happens if the user types a new key and hits "Generate" without "Save Key".
+            if (apiKeyInput.value.trim() && (apiKeyInput.value.trim() !== userProvidedApiKey) && (keyForApiCall.startsWith('sk-') || keyForApiCall.startsWith('sk-proj-'))) {
+                localStorage.setItem(userApiKeyStorageKey, keyForApiCall);
+                userProvidedApiKey = keyForApiCall; // Update the module-scoped variable
+                console.log("API Key from input field was used and saved.");
+            }
+            // --- END REFINED API KEY HANDLING ---
+
+
+            if (!selectedProjectName) {
+                alert('Please select a project to generate a proposal for.');
+                projectSelectDropdown.focus();
+                generateProposalButton.disabled = false;
+                return;
+            }
 
             const configsForProposal = currentProjectsData[selectedProjectName];
-            if (!configsForProposal || configsForProposal.length === 0) { /* ... (validation - no change) ... */ alert('No configurations found...'); return;}
+            if (!configsForProposal || configsForProposal.length === 0) {
+                alert(`No configurations found for project "${selectedProjectName}" to include in the proposal.`);
+                generateProposalButton.disabled = false;
+                return;
+            }
 
             const propCustomerName = customerNameInput.value.trim() || "[Client Name/Company Placeholder]";
             const propProjectName = projectNameInput.value.trim() || "[Project Name/Location Placeholder]";
             const propProjectNotes = projectNotesInput.value.trim();
 
             if (proposalStatusDiv) proposalStatusDiv.textContent = 'Generating proposal... Please wait.';
-            generateProposalButton.disabled = true; // Disable while generating
 
-            // configurationsDetails and totalEstimatedSellPrice calculation (no change)
             const configurationsDetails = configsForProposal.map(config => {
                 let details = `**Product Name:** ${config.derived_product_name || config.product_type || 'N/A'}\n`;
                 details += `**Product Code:** ${config.generated_product_code || 'N/A'}\n`;
@@ -229,8 +264,61 @@ document.addEventListener('DOMContentLoaded', function() {
             }).join('\n\n---\n\n');
             const totalEstimatedSellPrice = configsForProposal.reduce((sum, conf) => sum + (conf.quote_details?.estimated_sell_price || 0), 0).toFixed(2);
 
-            const systemPrompt = `You are an expert technical sales proposal writer for SuDS Enviro... (rest of your prompt, ensure placeholders {{CUSTOMER_NAME}}, {{PROJECT_NAME}}, {{PROJECT_NOTES}} are used, and Total Estimated Project Investment uses £${totalEstimatedSellPrice})`;
-            // ... (full system prompt as before)
+            const systemPrompt = `You are an expert technical sales proposal writer for SuDS Enviro, a premier UK-based provider of Sustainable Drainage Systems. Your primary function is to generate comprehensive, client-ready project proposals in well-structured Markdown format.
+
+**Client & Project Context (to be inserted by AI where placeholders are used in the template):**
+*   **Client Name/Company:** {{CUSTOMER_NAME}}
+*   **Project Name/Location:** {{PROJECT_NAME}}
+*   **Additional Project Notes/Context:** {{PROJECT_NOTES}}
+
+**Proposal Structure (Strictly Adhere to this Markdown structure, replacing placeholders):**
+
+# Project Proposal: Sustainable Drainage System for {{PROJECT_NAME}}
+
+**Date:** ${new Date().toLocaleDateString('en-GB')}
+**Prepared for:** {{CUSTOMER_NAME}}
+**Prepared by:** SuDS Enviro Sales Team
+
+## 1. Introduction
+Briefly introduce SuDS Enviro as a leader in innovative and compliant SuDS solutions. State the purpose of this proposal – to outline a recommended drainage system for the {{PROJECT_NAME}} based on the client's selected components. If project notes are available ({{PROJECT_NOTES}}), subtly weave any relevant context into the introduction or system overview.
+
+## 2. Executive Summary
+Provide a concise overview of the proposed system for {{PROJECT_NAME}}, highlighting its key benefits and its suitability for the project's (assumed) objectives like effective stormwater management, pollutant removal, and regulatory compliance. Mention the total estimated project value.
+
+## 3. Proposed SuDS Components & Specifications
+This section will detail each configured product. For each product, use the following format:
+(The AI will insert the product details here based on the user query data)
+
+## 4. Conceptual System Overview
+Provide a short paragraph describing how these components might function together within a typical SuDS management train for the {{PROJECT_NAME}}. Tailor this to the types of products included and any context from {{PROJECT_NOTES}}.
+
+## 5. Key Benefits of SuDS Enviro Solutions
+*   **Regulatory Compliance:** Our systems are designed to meet [mention relevant UK standards/guidelines like SuDS Manual, Sewers for Adoption/Design and Construction Guidance].
+*   **Environmental Protection:** Effectively reduces pollutants, improves water quality, and can enhance local biodiversity.
+*   **Flood Risk Mitigation:** Contributes to effective flood risk management by controlling runoff rates and volumes.
+*   **Durability & Quality:** Manufactured to high standards for long-term performance and reliability.
+*   **Expert Support:** SuDS Enviro offers comprehensive support from design to installation and maintenance.
+
+## 6. Total Estimated Project Investment
+The total estimated investment for the supply of the SuDS Enviro components listed above for the {{PROJECT_NAME}} is **£${totalEstimatedSellPrice}** (excluding VAT, delivery, and installation unless otherwise stated). A detailed formal quotation can be provided upon request.
+
+## 7. Next Steps
+We recommend the following next steps to progress the SuDS solution for {{PROJECT_NAME}}:
+1.  A brief consultation call to discuss your project requirements in more detail.
+2.  Review of site plans (if available) to optimize component selection and placement.
+3.  Provision of a formal, detailed quotation.
+Please contact us to proceed.
+
+## 8. Contact Information
+**SuDS Enviro**
+Email: info@sudsenviro.com
+Phone: 01224 057700
+Website: suds-enviro.com
+
+---
+*This proposal is based on the component configurations provided and is indicative. Final pricing and specifications are subject to a formal quotation.*
+---
+`;
 
             const userQuery = `
             Customer Name/Company: ${propCustomerName}
@@ -245,40 +333,60 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
 
             const aiApiEndpoint = 'https://api.openai.com/v1/chat/completions';
+            console.log("Using API Key for fetch:", keyForApiCall); // Debugging log
+
             try {
-                const requestBody = { /* ... */ }; // Same as before
-                const response = await fetch(aiApiEndpoint, { /* ... */ }); // Same as before
-                // ... (API fetch logic - same as before)
-                if (!response.ok) { const errorData = await response.json().catch(() => ({ error: { message: "Failed to parse API error." } })); throw new Error(`API request failed: ${errorData.error?.message || response.statusText}`); }
+                const requestBody = {
+                    model: "gpt-4o",
+                    messages: [
+                        { "role": "system", "content": systemPrompt },
+                        { "role": "user", "content": userQuery }
+                    ],
+                    max_tokens: 3500,
+                    temperature: 0.5
+                };
+
+                const response = await fetch(aiApiEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${keyForApiCall}` // Use the explicitly determined keyForApiCall
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: { message: "Failed to parse API error response." } }));
+                    console.error("API Error Response:", errorData); // Log the actual error from API
+                    throw new Error(`API request failed: ${errorData.error?.message || response.statusText || "Unknown API error"} (Status: ${response.status})`);
+                }
+
                 const data = await response.json();
-                rawMarkdownForDownload = data.choices?.[0]?.message?.content || "Could not extract proposal text.";
+                rawMarkdownForDownload = data.choices?.[0]?.message?.content || "Could not extract proposal text from API response.";
 
                 if (rawMarkdownForDownload && rawMarkdownForDownload !== "Could not extract proposal text from API response.") {
                     if (typeof marked !== 'undefined' && proposalOutputDiv) { proposalOutputDiv.innerHTML = marked.parse(rawMarkdownForDownload); }
-                    else if (proposalOutputDiv) { proposalOutputDiv.textContent = rawMarkdownForDownload; } // Fallback
+                    else if (proposalOutputDiv) { proposalOutputDiv.textContent = rawMarkdownForDownload; }
                     if(proposalStatusDiv) proposalStatusDiv.textContent = 'Proposal generated successfully!';
                     if(downloadProposalButton) downloadProposalButton.style.display = 'inline-block';
-                    if(copyMarkdownButton) copyMarkdownButton.style.display = 'inline-block'; // Show copy button
+                    if(copyMarkdownButton) copyMarkdownButton.style.display = 'inline-block';
                 } else {
                     if(proposalStatusDiv) proposalStatusDiv.textContent = 'Failed to generate valid proposal content from AI.';
-                    if(downloadProposalButton) downloadProposalButton.style.display = 'none';
-                    if(copyMarkdownButton) copyMarkdownButton.style.display = 'none';
+                    // Buttons remain hidden as set at the start of generate function
                 }
 
             } catch (error) {
                 console.error('Error generating proposal:', error);
                 if(proposalOutputDiv) proposalOutputDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
                 if(proposalStatusDiv) proposalStatusDiv.textContent = 'Proposal generation failed.';
-                if(downloadProposalButton) downloadProposalButton.style.display = 'none';
-                if(copyMarkdownButton) copyMarkdownButton.style.display = 'none';
+                // Buttons remain hidden
             } finally {
-                if(generateProposalButton) generateProposalButton.disabled = false;
+                if(generateProposalButton) generateProposalButton.disabled = false; // Re-enable button
             }
         });
     }
 
-    // NEW: Event listener for Copy Markdown button
-    if (copyMarkdownButton) {
+    if (copyMarkdownButton) { /* ... no change ... */
         copyMarkdownButton.addEventListener('click', function() {
             if (!rawMarkdownForDownload || rawMarkdownForDownload === "Could not extract proposal text from API response." || rawMarkdownForDownload.startsWith("Error generating proposal")) {
                 alert('No valid proposal Markdown to copy. Please generate a proposal first.');
@@ -297,8 +405,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
-    if (downloadProposalButton) { /* ... (no change to download HTML logic itself) ... */
+    if (downloadProposalButton) { /* ... no change ... */
         downloadProposalButton.addEventListener('click', function() {
             if (!proposalOutputDiv || !rawMarkdownForDownload || rawMarkdownForDownload === "Could not extract proposal text from API response." || rawMarkdownForDownload.startsWith("Error generating proposal")) {
                 alert('No valid proposal content to download.'); return;
@@ -317,11 +424,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
     loadApiKey();
     loadInitialData();
 
-    window.addEventListener('storage', function(event) { /* ... no change ... */
+    window.addEventListener('storage', function(event) {
         if (event.key === projectDataStorageKey) { loadInitialData(); }
         if (event.key === userApiKeyStorageKey) loadApiKey();
     });

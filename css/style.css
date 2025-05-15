@@ -468,55 +468,57 @@ body {
 /* ==========================================================================
    7. RESPONSIVE STYLES (Mobile Navbar and Page Adjustments)
    ========================================================================== */
-@media (max-width: 991px) { 
+@media (max-width: 991px) {
     body {
-        padding-top: var(--navbar-height-mobile); 
+        padding-top: var(--navbar-height-mobile);
     }
     .navbar {
         height: var(--navbar-height-mobile);
-        padding: 0 15px; 
+        padding: 0 15px;
     }
     .nav-logo img {
-        height: 35px; 
+        height: 35px;
     }
     .menu-toggle {
-        display: flex; 
+        display: flex;
     }
     .nav-links {
-        display: none; 
+        display: none; /* Initially hidden */
         flex-direction: column;
         width: 100%;
-        background-color: #ffffff;
+        /* ENSURE THESE PROPERTIES ARE SET FOR THE DROPDOWN APPEARANCE */
+        background-color: #ffffff; /* <<< THIS IS THE KEY FOR OPAQUE BACKGROUND */
         position: absolute;
-        top: var(--navbar-height-mobile); 
+        top: var(--navbar-height-mobile); /* Position it right below the navbar */
         left: 0;
-        padding: 10px 0;
-        box-shadow: 0 4px 5px rgba(0,0,0,0.1);
-        border-top: 1px solid var(--suds-border-light);
+        padding: 10px 0; /* Add some vertical padding inside the dropdown */
+        box-shadow: 0 4px 5px rgba(0,0,0,0.1); /* Optional: shadow for depth */
+        border-top: 1px solid var(--suds-border-light); /* Optional: separator line */
+        z-index: 999; /* Ensure it's above other content but below the main navbar if fixed */
     }
-    .nav-links.active { 
-        display: flex;
+    .nav-links.active {
+        display: flex; /* This class is toggled by JS to show the menu */
     }
     .nav-links li {
         margin-left: 0;
         width: 100%;
-        height: auto; 
+        height: auto;
     }
     .nav-links a {
-        padding: 12px 20px; 
+        padding: 12px 20px;
         width: 100%;
         text-align: left;
-        border-bottom: 1px solid #f0f0f0; 
-        height: auto; 
+        border-bottom: 1px solid #f0f0f0;
+        height: auto;
         box-sizing: border-box;
-        font-size: 1rem; /* Slightly larger for mobile touch */
+        font-size: 1rem;
     }
     .nav-links li:last-child a {
         border-bottom: none;
     }
-    .nav-links a.active {
-        box-shadow: inset 4px 0 0 0 var(--suds-green); /* Left border for active */
-        background-color: var(--suds-bg-light); /* Lighter active bg for mobile */
+    .nav-links a.active { /* Styling for the link corresponding to the current page */
+        box-shadow: inset 4px 0 0 0 var(--suds-green);
+        background-color: var(--suds-bg-light);
         color: var(--suds-blue);
     }
     .nav-links a.active:hover {

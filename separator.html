@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuDS Enviro - Hydrodynamic Separator Configurator</title> <!-- Standardized -->
+    <title>SuDS Enviro - Hydrodynamic Separator Configurator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css"> <!-- Link to shared/global CSS -->
+    <link rel="stylesheet" href="css/style.css">
 
-    <!-- Internal CSS specific to the Separator Configurator Form -->
     <style>
-        /* --- Copied CSS from original separator.html <style> block --- */
+        /* Internal CSS specific to the Separator Configurator Form */
         :root {
             --suds-blue: #1d80b9; --suds-green: #54b54d; --suds-red: #c34c4a;
             --suds-text-dark: #333; --suds-text-heading: var(--suds-blue);
@@ -19,7 +18,6 @@
             --suds-bg-light: #f9fafb; --suds-bg-conditional: #eef7ff;
             --suds-select-bg: #e0e8f0; --suds-select-arrow: var(--suds-blue);
         }
-        /* body styling is handled by global style.css */
         .suds-configurator-form {
             max-width: 750px; margin: 20px auto; padding: 30px; background: #fff;
             border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
@@ -84,7 +82,6 @@
         #cost_price_label, #sell_price_label { color: var(--suds-text-heading); margin-right: 10px; font-weight: 700; }
         #cost_price_value, #sell_price_value { color: var(--suds-green); font-weight: 700; min-width: 70px; }
         #sell_price_value { color: var(--suds-blue); }
-
         @media (max-width: 768px){
             .suds-configurator-form h2{font-size:1.6em}
             .suds-configurator-form h3{font-size:1.3em}
@@ -95,7 +92,6 @@
     </style>
 </head>
 <body>
-   <!-- NEW NAVBAR - Standardized -->
 <nav class="navbar">
     <a href="index.html" class="nav-logo">
         <img src="assets/images/logo_horizontal.png" alt="SuDS Enviro Logo">
@@ -112,14 +108,22 @@
         <li><a href="catchpit.html">Catchpit Config</a></li>
         <li><a href="orifice.html">Orifice Config</a></li>
         <li><a href="universal_chamber.html">Chamber Config</a></li>
-        <li><a href="separator.html" class="active">Separator Config</a></li> <!-- Active Link -->
+        <li><a href="separator.html" class="active">Separator Config</a></li>
     </ul>
 </nav>
 
     <form id="sudsSeparatorForm" class="suds-configurator-form">
+        <!-- NEW: Customer/Project Name Input -->
+        <div class="suds-form-group">
+            <label class="suds-label" for="customer_project_name" style="color: var(--suds-blue); font-weight: 700;">Customer / Project Name:</label>
+            <input type="text" id="customer_project_name" name="customer_project_name" class="suds-input" placeholder="e.g., Bob Co. - Site A (Leave blank for default project)">
+        </div>
+        <hr style="margin: 5px 0 25px 0;">
+        <!-- END NEW INPUT -->
+
         <div class="suds-form-section">
             <h2>Hydrodynamic Separator Configuration</h2>
-
+            <!-- ... rest of your original form content ... -->
             <h3>Core Properties</h3>
             <div class="suds-form-group">
                 <label class="suds-label">Adoptable Status:</label>

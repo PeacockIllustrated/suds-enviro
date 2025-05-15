@@ -33,19 +33,14 @@
             <h1>Saved Product Configurations</h1>
         </div>
 
-        <!-- NEW: Project Selector Dropdown -->
         <div class="project-selector-container suds-form-group" style="margin-bottom: 20px; text-align: center;">
             <label for="project-select" style="display:block; font-weight:700; margin-bottom:8px; font-size: 1.1em; color: var(--suds-blue);">View Configurations for Project:</label>
             <select id="project-select" class="suds-select" style="width:100%; max-width:450px; margin: 0 auto; display:block; padding: 10px 15px; font-size: 1em;">
                 <option value="">-- Select a Project --</option>
-                <!-- Options will be populated by JS -->
             </select>
         </div>
-        <!-- END NEW -->
-
 
         <div class="action-buttons-container">
-            <!-- Buttons will be enabled/disabled by JS based on project selection -->
             <button id="export-project-configs-btn" title="Export configurations for the selected project">Export Selected Project (JSON)</button>
             <button id="clear-project-configs-btn" title="Clear all configurations for the selected project">Clear Selected Project Configs</button>
         </div>
@@ -86,6 +81,7 @@
 
             <div class="action-buttons-container">
                 <button id="generate-proposal-btn">Generate Proposal (from Selected Project)</button>
+                <button id="copy-markdown-btn" style="display: none; background-color: var(--suds-text-dark);">Copy Markdown</button> <!-- UPDATED -->
                 <button id="download-proposal-btn" style="display: none;">Download Proposal (.html)</button>
             </div>
             <div id="proposal-status"></div>

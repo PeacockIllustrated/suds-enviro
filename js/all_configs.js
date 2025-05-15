@@ -1,6 +1,6 @@
 // js/all_configs.js
 document.addEventListener('DOMContentLoaded', function() {
-    // ... (other const declarations and existing functions like saveUserApiKey, populateProjectSelector etc. remain the same) ...
+    // DOM Element References
     const configList = document.getElementById('config-list');
     const projectSelectDropdown = document.getElementById('project-select');
     const exportProjectButton = document.getElementById('export-project-configs-btn');
@@ -19,64 +19,62 @@ document.addEventListener('DOMContentLoaded', function() {
     const proposalOutputDiv = document.getElementById('proposal-output');
     const proposalStatusDiv = document.getElementById('proposal-status');
 
+    // localStorage Keys
     const projectDataStorageKey = 'sudsUserProjectsData';
     const userApiKeyStorageKey = 'sudsUserOpenAiApiKey';
     const DEFAULT_PROJECT_NAME = "_DEFAULT_PROJECT_";
 
-    let userProvidedApiKey = ''; // This will be set by loadApiKey
+    // Module-scoped variables
+    let userProvidedApiKey = '';
     let rawMarkdownForDownload = '';
-    let currentProjectsData = {};
+    let currentProjectsData = {}; // Stores all loaded project data: { "projectName": [configs...], ... }
 
+    // --- API Key Management ---
     function loadApiKey() {
         const storedKey = localStorage.getItem(userApiKeyStorageKey);
         if (storedKey) {
-            userProvidedApiKey = storedKey; // Update module-scoped variable
-            if (apiKeyInput) {
-                apiKeyInput.value = storedKey; // Set the input field value
-                console.log("API Key loaded from storage into input field and variable:", storedKey);
-            }
+            userProvidedApiKey = storedKey;
+            if (apiKeyInput) apiKeyInput.value = storedKey;
         } else {
-            userProvidedApiKey = ''; // Ensure it's empty if nothing in storage
-            if (apiKeyInput) apiKeyInput.value = ''; // Clear input field
-            console.log("No API Key found in storage.");
+            userProvidedApiKey = '';
+            if (apiKeyInput) apiKeyInput.value = '';
         }
     }
 
     function saveUserApiKey() {
         if (!apiKeyInput) return;
         const newKeyFromInput = apiKeyInput.value.trim();
-        if (newKeyFromInput && (newKeyFromInput.startsWith('sk-') || newKeyFromInput.startsWith('sk-proj-'))) {
-            if (newKeyFromInput.length > 20) { // Basic length check
-                localStorage.setItem(userApiKeyStorageKey, newKeyFromInput);
-                userProvidedApiKey = newKeyFromInput; // CRITICAL: Update module-scoped variable
-                alert('API Key saved successfully!');
-                console.log("API Key saved and userProvidedApiKey updated to:", userProvidedApiKey);
-            } else {
-                alert('API Key appears too short to be valid.');
-            }
+        if (newKeyFromInput && (newKeyFromInput.startsWith('sk-') || newKeyFromInput.startsWith('sk-proj-')) && newKeyFromInput.length > 20) {
+            localStorage.setItem(userApiKeyStorageKey, newKeyFromInput);
+            userProvidedApiKey = newKeyFromInput;
+            alert('API Key saved successfully!');
         } else if (newKeyFromInput === "") {
             localStorage.removeItem(userApiKeyStorageKey);
-            userProvidedApiKey = ""; // CRITICAL: Update module-scoped variable
+            userProvidedApiKey = "";
             alert('API Key cleared.');
-            console.log("API Key cleared and userProvidedApiKey updated.");
         } else {
-            alert('Invalid API Key format. Please enter a valid key.');
+            alert('Invalid API Key format or length. Please enter a valid key (e.g., starting with "sk-" or "sk-proj-").');
         }
     }
 
     if (saveApiKeyButton) {
         saveApiKeyButton.addEventListener('click', saveUserApiKey);
     }
-    // ... (populateProjectSelector, displayConfigurationsForSelectedProject, loadInitialData, deleteConfiguration, export, clear buttons - all remain the same) ...
-    function populateProjectSelector() { /* ... no change ... */
+
+    // --- Project and Configuration Management ---
+    function populateProjectSelector() {
         projectSelectDropdown.innerHTML = '<option value="">-- Select a Project --</option>';
         const projectNames = Object.keys(currentProjectsData);
+
         if (projectNames.length === 0) {
             const option = document.createElement('option');
-            option.value = ""; option.textContent = "No projects found"; option.disabled = true;
+            option.value = "";
+            option.textContent = "No projects found";
+            option.disabled = true;
             projectSelectDropdown.appendChild(option);
             return;
         }
+
         projectNames.sort().forEach(name => {
             const option = document.createElement('option');
             option.value = name;
@@ -85,11 +83,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function displayConfigurationsForSelectedProject() { /* ... no change ... */
+    function displayConfigurationsForSelectedProject() {
         const selectedProjectName = projectSelectDropdown.value;
         configList.innerHTML = '';
         if (copyMarkdownButton) copyMarkdownButton.style.display = 'none';
         if (downloadProposalButton) downloadProposalButton.style.display = 'none';
+        if (proposalStatusDiv) proposalStatusDiv.textContent = '';
+        if (proposalOutputDiv) proposalOutputDiv.innerHTML = 'Proposal will appear here once generated...';
+
+
         if (!selectedProjectName || !currentProjectsData[selectedProjectName]) {
             configList.innerHTML = '<p style="text-align: center; color: #666; margin: 20px 0;">Please select a project to view its configurations.</p>';
             if (exportProjectButton) exportProjectButton.disabled = true;
@@ -99,7 +101,9 @@ document.addEventListener('DOMContentLoaded', function() {
             projectNameInput.value = '';
             return;
         }
+
         const configs = currentProjectsData[selectedProjectName];
+
         if (configs.length === 0) {
             configList.innerHTML = `<p style="text-align: center; color: #666; margin: 20px 0;">No configurations saved for project: ${selectedProjectName}.</p>`;
             if (exportProjectButton) exportProjectButton.disabled = false;
@@ -109,28 +113,55 @@ document.addEventListener('DOMContentLoaded', function() {
             if (exportProjectButton) exportProjectButton.disabled = false;
             if (clearProjectButton) clearProjectButton.disabled = false;
             if (generateProposalButton) generateProposalButton.disabled = false;
+
             configs.forEach((config, index) => {
-                const listItem = document.createElement('li'); listItem.className = 'config-item';
-                listItem.dataset.projectName = selectedProjectName; listItem.dataset.index = index;
-                const detailsDiv = document.createElement('div'); detailsDiv.className = 'config-item-details';
-                const nameStrong = document.createElement('strong'); nameStrong.textContent = config.derived_product_name || config.product_type || 'Unnamed Configuration'; detailsDiv.appendChild(nameStrong);
+                const listItem = document.createElement('li');
+                listItem.className = 'config-item';
+                listItem.dataset.projectName = selectedProjectName;
+                listItem.dataset.index = index;
+
+                const detailsDiv = document.createElement('div');
+                detailsDiv.className = 'config-item-details';
+                const nameStrong = document.createElement('strong');
+                nameStrong.textContent = config.derived_product_name || config.product_type || 'Unnamed Configuration';
+                detailsDiv.appendChild(nameStrong);
                 if (config.generated_product_code) { const codeP = document.createElement('p'); codeP.textContent = `Product Code: ${config.generated_product_code}`; detailsDiv.appendChild(codeP); }
                 if (config.savedTimestamp) { const timeP = document.createElement('p'); timeP.className = 'timestamp'; timeP.textContent = `Saved: ${new Date(config.savedTimestamp).toLocaleString()}`; detailsDiv.appendChild(timeP); }
                 if (config.savedId) { const idSP = document.createElement('p'); idSP.className = 'timestamp'; idSP.textContent = `Saved ID: ${config.savedId}`; detailsDiv.appendChild(idSP); }
-                const actionsDiv = document.createElement('div'); actionsDiv.className = 'config-item-actions';
-                const viewDetailsButton = document.createElement('button'); viewDetailsButton.textContent = 'View Details'; viewDetailsButton.className = 'view-details-btn';
-                viewDetailsButton.onclick = function() { const pre = listItem.querySelector('pre'); if (pre) pre.style.display = pre.style.display === 'none' ? 'block' : 'none'; };
-                const deleteButton = document.createElement('button'); deleteButton.textContent = 'Delete'; deleteButton.className = 'delete-btn';
-                deleteButton.onclick = function() { if (confirm(`Are you sure you want to delete this configuration from project "${selectedProjectName}"?`)) { deleteConfiguration(selectedProjectName, index); } };
-                actionsDiv.appendChild(viewDetailsButton); actionsDiv.appendChild(deleteButton);
-                const detailsPre = document.createElement('pre'); detailsPre.textContent = JSON.stringify(config, null, 2);
-                listItem.appendChild(detailsDiv); listItem.appendChild(actionsDiv); listItem.appendChild(detailsPre); configList.appendChild(listItem);
+
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'config-item-actions';
+                const viewDetailsButton = document.createElement('button');
+                viewDetailsButton.textContent = 'View Details';
+                viewDetailsButton.className = 'view-details-btn';
+                viewDetailsButton.onclick = function() {
+                    const pre = listItem.querySelector('pre');
+                    if (pre) pre.style.display = pre.style.display === 'none' ? 'block' : 'none';
+                };
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'delete-btn';
+                deleteButton.onclick = function() {
+                    if (confirm(`Are you sure you want to delete this configuration from project "${selectedProjectName}"?`)) {
+                        deleteConfiguration(selectedProjectName, index);
+                    }
+                };
+                actionsDiv.appendChild(viewDetailsButton);
+                actionsDiv.appendChild(deleteButton);
+
+                const detailsPre = document.createElement('pre');
+                detailsPre.textContent = JSON.stringify(config, null, 2);
+                listItem.appendChild(detailsDiv);
+                listItem.appendChild(actionsDiv);
+                listItem.appendChild(detailsPre);
+                configList.appendChild(listItem);
             });
         }
+
         if (selectedProjectName && selectedProjectName !== DEFAULT_PROJECT_NAME) {
             const parts = selectedProjectName.split(" - ");
             customerNameInput.value = parts[0] || selectedProjectName;
-            projectNameInput.value = parts[1] || (parts[0] ? '' : selectedProjectName);
+            projectNameInput.value = parts.length > 1 ? parts.slice(1).join(" - ") : (parts[0] ? '' : selectedProjectName);
         } else if (selectedProjectName === DEFAULT_PROJECT_NAME) {
              customerNameInput.value = '';
              projectNameInput.value = 'Default Project';
@@ -140,54 +171,83 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function loadInitialData() { /* ... no change ... */
+    function loadInitialData() {
         const storedData = localStorage.getItem(projectDataStorageKey);
         if (storedData) {
-            try { currentProjectsData = JSON.parse(storedData); if (typeof currentProjectsData !== 'object' || currentProjectsData === null) { currentProjectsData = {}; } }
-            catch (e) { console.error("Error parsing project data from localStorage:", e); currentProjectsData = {}; }
-        } else { currentProjectsData = {}; }
+            try {
+                currentProjectsData = JSON.parse(storedData);
+                if (typeof currentProjectsData !== 'object' || currentProjectsData === null) {
+                    currentProjectsData = {};
+                }
+            } catch (e) {
+                console.error("Error parsing project data from localStorage:", e);
+                currentProjectsData = {};
+            }
+        } else {
+            currentProjectsData = {};
+        }
         populateProjectSelector();
         displayConfigurationsForSelectedProject();
     }
 
-    function deleteConfiguration(projectName, indexToDelete) { /* ... no change ... */
+    function deleteConfiguration(projectName, indexToDelete) {
         if (!currentProjectsData[projectName]) return;
         currentProjectsData[projectName].splice(indexToDelete, 1);
+        // If project array becomes empty and it's NOT the default project, consider removing the project key
+        // if (currentProjectsData[projectName].length === 0 && projectName !== DEFAULT_PROJECT_NAME) {
+        //     delete currentProjectsData[projectName];
+        //     populateProjectSelector(); // Need to refresh dropdown if a project is removed
+        // }
         localStorage.setItem(projectDataStorageKey, JSON.stringify(currentProjectsData));
-        displayConfigurationsForSelectedProject();
+        displayConfigurationsForSelectedProject(); // Refresh list for current (possibly now empty) project
     }
 
-    if (projectSelectDropdown) { /* ... no change ... */
+    if (projectSelectDropdown) {
         projectSelectDropdown.addEventListener('change', displayConfigurationsForSelectedProject);
     }
-    if (exportProjectButton) { /* ... no change ... */
+
+    if (exportProjectButton) {
         exportProjectButton.addEventListener('click', function() {
             const selectedProjectName = projectSelectDropdown.value;
-            if (!selectedProjectName || !currentProjectsData[selectedProjectName]) { alert('Please select a project with configurations to export.'); return; }
-            const dataToExport = { [selectedProjectName]: currentProjectsData[selectedProjectName] };
+            if (!selectedProjectName || !currentProjectsData[selectedProjectName] || currentProjectsData[selectedProjectName].length === 0) {
+                alert('Please select a project with configurations to export.');
+                return;
+            }
+            const dataToExport = { [selectedProjectName]: currentProjectsData[selectedProjectName] }; // Export as an object with project name as key
             const jsonString = JSON.stringify(dataToExport, null, 2);
             const blob = new Blob([jsonString], { type: 'application/json' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `suds_configs_${selectedProjectName.replace(/\s+/g, '_')}.json`;
-            document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(link.href);
+            link.download = `suds_configs_${selectedProjectName.replace(/[^\w.-]/g, '_')}.json`; // Sanitize filename
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
         });
     }
-    if (clearProjectButton) { /* ... no change ... */
+
+    if (clearProjectButton) {
         clearProjectButton.addEventListener('click', function() {
             const selectedProjectName = projectSelectDropdown.value;
-            if (!selectedProjectName) { alert('Please select a project to clear.'); return; }
+            if (!selectedProjectName) {
+                alert('Please select a project to clear.');
+                return;
+            }
             if (confirm(`Are you sure you want to delete ALL configurations for project "${selectedProjectName}"? This cannot be undone.`)) {
                 if (currentProjectsData[selectedProjectName]) {
-                    if (selectedProjectName === DEFAULT_PROJECT_NAME) { currentProjectsData[DEFAULT_PROJECT_NAME] = []; }
-                    else { delete currentProjectsData[selectedProjectName]; }
+                    if (selectedProjectName === DEFAULT_PROJECT_NAME) {
+                        currentProjectsData[DEFAULT_PROJECT_NAME] = []; // Clear the array for default
+                    } else {
+                        delete currentProjectsData[selectedProjectName]; // Remove the project key entirely
+                    }
                     localStorage.setItem(projectDataStorageKey, JSON.stringify(currentProjectsData));
                 }
-                loadInitialData();
+                loadInitialData(); // Reload everything to update dropdown and list
             }
         });
     }
-    if (clearAllProjectDataButton) { /* ... no change ... */
+
+    if (clearAllProjectDataButton) {
         clearAllProjectDataButton.addEventListener('click', function() {
             if (confirm("DANGER! Are you absolutely sure you want to delete ALL configurations for ALL projects? This is irreversible!")) {
                 if (confirm("SECOND CONFIRMATION: This will wipe all saved project configurations. Proceed?")) {
@@ -200,70 +260,54 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // --- Proposal Generation ---
     if (generateProposalButton) {
         generateProposalButton.addEventListener('click', async function() {
-            const selectedProjectName = projectSelectDropdown.value;
-
-            if (proposalStatusDiv) proposalStatusDiv.textContent = 'Preparing to generate...';
-            if (proposalOutputDiv) proposalOutputDiv.innerHTML = '';
+            if (proposalStatusDiv) proposalStatusDiv.textContent = '';
+            if (proposalOutputDiv) proposalOutputDiv.innerHTML = 'Proposal will appear here once generated...';
             if (downloadProposalButton) downloadProposalButton.style.display = 'none';
             if (copyMarkdownButton) copyMarkdownButton.style.display = 'none';
-            generateProposalButton.disabled = true;
 
-            // --- REFINED API KEY LOGIC ---
-            // 1. Prioritize the key currently in the input field if it's valid.
-            // 2. Fallback to the module-scoped 'userProvidedApiKey' (loaded from storage).
+            const selectedProjectName = projectSelectDropdown.value;
             let keyFromInput = apiKeyInput.value.trim();
             let keyForApiCall = '';
 
             if (keyFromInput && (keyFromInput.startsWith('sk-') || keyFromInput.startsWith('sk-proj-')) && keyFromInput.length > 20) {
                 keyForApiCall = keyFromInput;
-                // If this valid key from input is different from what's in storage (or what was loaded into userProvidedApiKey),
-                // then update storage and userProvidedApiKey. This handles the case where a user types/pastes a new key
-                // and hits "Generate" without explicitly hitting "Save Key".
                 if (keyForApiCall !== userProvidedApiKey) {
                     localStorage.setItem(userApiKeyStorageKey, keyForApiCall);
                     userProvidedApiKey = keyForApiCall;
-                    console.log("API Key from input field used and saved/updated:", keyForApiCall);
-                } else {
-                    console.log("API Key from input field matches stored key:", keyForApiCall);
                 }
             } else if (userProvidedApiKey && (userProvidedApiKey.startsWith('sk-') || userProvidedApiKey.startsWith('sk-proj-')) && userProvidedApiKey.length > 20) {
-                // Input field was empty or invalid, but we have a valid key from storage.
                 keyForApiCall = userProvidedApiKey;
-                console.log("Using API Key from storage (userProvidedApiKey):", keyForApiCall);
             }
 
-            // Final validation before API call
             if (!keyForApiCall || !(keyForApiCall.startsWith('sk-') || keyForApiCall.startsWith('sk-proj-')) || keyForApiCall.length < 20) {
                 alert('A valid OpenAI API Key is required. Please enter it, ensure it starts with "sk-" or "sk-proj-", is of sufficient length, and click "Save Key" if needed.');
                 if (apiKeyInput) apiKeyInput.focus();
-                generateProposalButton.disabled = false;
                 return;
             }
-            // --- END REFINED API KEY LOGIC ---
 
             if (!selectedProjectName) {
                 alert('Please select a project to generate a proposal for.');
                 projectSelectDropdown.focus();
-                generateProposalButton.disabled = false;
                 return;
             }
 
             const configsForProposal = currentProjectsData[selectedProjectName];
             if (!configsForProposal || configsForProposal.length === 0) {
                 alert(`No configurations found for project "${selectedProjectName}" to include in the proposal.`);
-                generateProposalButton.disabled = false;
                 return;
             }
+
+            if (proposalStatusDiv) proposalStatusDiv.textContent = 'Generating proposal... Please wait.';
+            generateProposalButton.disabled = true;
 
             const propCustomerName = customerNameInput.value.trim() || "[Client Name/Company Placeholder]";
             const propProjectName = projectNameInput.value.trim() || "[Project Name/Location Placeholder]";
             const propProjectNotes = projectNotesInput.value.trim();
 
-            if (proposalStatusDiv) proposalStatusDiv.textContent = 'Generating proposal... Please wait.';
-
-            const configurationsDetails = /* ... (no change) ... */ configsForProposal.map(config => {
+            const configurationsDetails = configsForProposal.map(config => {
                 let details = `**Product Name:** ${config.derived_product_name || config.product_type || 'N/A'}\n`;
                 details += `**Product Code:** ${config.generated_product_code || 'N/A'}\n`;
                 if (config.catchpit_details) { details += `  * Type: ${config.catchpit_details.catchpit_type || 'N/A'}\n  * Depth: ${config.catchpit_details.depth_mm || 'N/A'}mm\n  * Pipework Diameter: ${config.catchpit_details.pipework_diameter || 'N/A'}\n  * Target Pollutant: ${config.catchpit_details.target_pollutant || 'N/A'}\n  * Removable Bucket: ${config.catchpit_details.removable_bucket ? 'Yes' : 'No'}\n`;}
@@ -274,34 +318,106 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (config.quote_details && typeof config.quote_details.estimated_sell_price === 'number') { details += `  * **Estimated Sell Price:** £${config.quote_details.estimated_sell_price.toFixed(2)}\n`; }
                 return details;
             }).join('\n\n---\n\n');
-            const totalEstimatedSellPrice = /* ... (no change) ... */ configsForProposal.reduce((sum, conf) => sum + (conf.quote_details?.estimated_sell_price || 0), 0).toFixed(2);
+            const totalEstimatedSellPrice = configsForProposal.reduce((sum, conf) => sum + (conf.quote_details?.estimated_sell_price || 0), 0).toFixed(2);
 
-            const systemPrompt = `You are an expert technical sales proposal writer for SuDS Enviro... (full prompt with {{CUSTOMER_NAME}}, {{PROJECT_NAME}}, {{PROJECT_NOTES}}, and £${totalEstimatedSellPrice})`;
+            const systemPrompt = `You are an expert technical sales proposal writer for SuDS Enviro, a premier UK-based provider of Sustainable Drainage Systems. Your primary function is to generate comprehensive, client-ready project proposals in well-structured Markdown format.
+
+**Client & Project Context (to be inserted by AI where placeholders are used in the template):**
+*   **Client Name/Company:** {{CUSTOMER_NAME}}
+*   **Project Name/Location:** {{PROJECT_NAME}}
+*   **Additional Project Notes/Context:** {{PROJECT_NOTES}}
+
+**Proposal Structure (Strictly Adhere to this Markdown structure, replacing placeholders):**
+
+# Project Proposal: Sustainable Drainage System for {{PROJECT_NAME}}
+
+**Date:** ${new Date().toLocaleDateString('en-GB')}
+**Prepared for:** {{CUSTOMER_NAME}}
+**Prepared by:** SuDS Enviro Sales Team
+
+## 1. Introduction
+Briefly introduce SuDS Enviro as a leader in innovative and compliant SuDS solutions. State the purpose of this proposal – to outline a recommended drainage system for the {{PROJECT_NAME}} based on the client's selected components. If project notes are available ({{PROJECT_NOTES}}), subtly weave any relevant context into the introduction or system overview.
+
+## 2. Executive Summary
+Provide a concise overview of the proposed system for {{PROJECT_NAME}}, highlighting its key benefits and its suitability for the project's (assumed) objectives like effective stormwater management, pollutant removal, and regulatory compliance. Mention the total estimated project value.
+
+## 3. Proposed SuDS Components & Specifications
+This section will detail each configured product. For each product, use the following format:
+(The AI will insert the product details here based on the user query data)
+
+## 4. Conceptual System Overview
+Provide a short paragraph describing how these components might function together within a typical SuDS management train for the {{PROJECT_NAME}}. Tailor this to the types of products included and any context from {{PROJECT_NOTES}}.
+
+## 5. Key Benefits of SuDS Enviro Solutions
+*   **Regulatory Compliance:** Our systems are designed to meet [mention relevant UK standards/guidelines like SuDS Manual, Sewers for Adoption/Design and Construction Guidance].
+*   **Environmental Protection:** Effectively reduces pollutants, improves water quality, and can enhance local biodiversity.
+*   **Flood Risk Mitigation:** Contributes to effective flood risk management by controlling runoff rates and volumes.
+*   **Durability & Quality:** Manufactured to high standards for long-term performance and reliability.
+*   **Expert Support:** SuDS Enviro offers comprehensive support from design to installation and maintenance.
+
+## 6. Total Estimated Project Investment
+The total estimated investment for the supply of the SuDS Enviro components listed above for the {{PROJECT_NAME}} is **£${totalEstimatedSellPrice}** (excluding VAT, delivery, and installation unless otherwise stated). A detailed formal quotation can be provided upon request.
+
+## 7. Next Steps
+We recommend the following next steps to progress the SuDS solution for {{PROJECT_NAME}}:
+1.  A brief consultation call to discuss your project requirements in more detail.
+2.  Review of site plans (if available) to optimize component selection and placement.
+3.  Provision of a formal, detailed quotation.
+Please contact us to proceed.
+
+## 8. Contact Information
+**SuDS Enviro**
+Email: info@sudsenviro.com
+Phone: 01224 057700
+Website: suds-enviro.com
+
+---
+*This proposal is based on the component configurations provided and is indicative. Final pricing and specifications are subject to a formal quotation.*
+---
+`;
+
             const userQuery = `
             Customer Name/Company: ${propCustomerName}
             Project Name/Location: ${propProjectName}
             Additional Project Notes: ${propProjectNotes || "None provided."}
-            ...
+
+            Please generate a project proposal using the system prompt's structure and the product data below.
+            Ensure all placeholders like {{CUSTOMER_NAME}}, {{PROJECT_NAME}}, and {{PROJECT_NOTES}} in the system prompt template are correctly filled with the information provided above.
+
             **Configured Product Data for project "${selectedProjectName}":**
-            ${configurationsDetails}`;
+            ${configurationsDetails}
+            `;
 
             const aiApiEndpoint = 'https://api.openai.com/v1/chat/completions';
-            console.log(">>> Preparing to send API request. Using API Key:", keyForApiCall.substring(0, 10) + "..."); // Log a portion for verification
 
             try {
-                const requestBody = { /* ... */ }; // Same as before
+                const requestBody = {
+                    model: "gpt-4o",
+                    messages: [
+                        { "role": "system", "content": systemPrompt },
+                        { "role": "user", "content": userQuery }
+                    ],
+                    max_tokens: 3500,
+                    temperature: 0.5
+                };
+
                 const response = await fetch(aiApiEndpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${keyForApiCall}` // Use the determined keyForApiCall
+                        'Authorization': `Bearer ${keyForApiCall}`
                     },
                     body: JSON.stringify(requestBody)
                 });
-                // ... (rest of the try/catch/finally for API call and response handling - no change)
-                if (!response.ok) { const errorData = await response.json().catch(() => ({ error: { message: "Failed to parse API error." } })); throw new Error(`API request failed: ${errorData.error?.message || response.statusText} (Status: ${response.status})`); }
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: { message: "Failed to parse API error response." } }));
+                    throw new Error(`API request failed: ${errorData.error?.message || response.statusText} (Status: ${response.status})`);
+                }
+
                 const data = await response.json();
-                rawMarkdownForDownload = data.choices?.[0]?.message?.content || "Could not extract proposal text.";
+                rawMarkdownForDownload = data.choices?.[0]?.message?.content || "Could not extract proposal text from API response.";
+
                 if (rawMarkdownForDownload && rawMarkdownForDownload !== "Could not extract proposal text from API response.") {
                     if (typeof marked !== 'undefined' && proposalOutputDiv) { proposalOutputDiv.innerHTML = marked.parse(rawMarkdownForDownload); }
                     else if (proposalOutputDiv) { proposalOutputDiv.textContent = rawMarkdownForDownload; }
@@ -321,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if (copyMarkdownButton) { /* ... no change ... */
+    if (copyMarkdownButton) {
         copyMarkdownButton.addEventListener('click', function() {
             if (!rawMarkdownForDownload || rawMarkdownForDownload === "Could not extract proposal text from API response." || rawMarkdownForDownload.startsWith("Error generating proposal")) {
                 alert('No valid proposal Markdown to copy. Please generate a proposal first.');
@@ -340,16 +456,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if (downloadProposalButton) { /* ... no change ... */
+    if (downloadProposalButton) {
         downloadProposalButton.addEventListener('click', function() {
             if (!proposalOutputDiv || !rawMarkdownForDownload || rawMarkdownForDownload === "Could not extract proposal text from API response." || rawMarkdownForDownload.startsWith("Error generating proposal")) {
-                alert('No valid proposal content to download.'); return;
+                alert('No valid proposal content to download. Please generate a proposal first.'); return;
             }
             const htmlToDownload = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>SuDS Enviro Project Proposal</title><style>body{font-family:Arial,sans-serif;line-height:1.6;margin:40px;color:#333}h1,h2,h3,h4,h5,h6{color:#1d80b9;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}h1{font-size:26px;margin-bottom:15px;border-bottom:2px solid #1d80b9;padding-bottom:8px}h2{font-size:22px;margin-top:30px;margin-bottom:12px;border-bottom:1px solid #54b54d;padding-bottom:6px}h3{font-size:18px;margin-top:25px;margin-bottom:10px;color:#1a73a8}p{margin-bottom:12px;text-align:justify}ul,ol{margin-left:20px;margin-bottom:12px;padding-left:20px}li{margin-bottom:6px}strong{font-weight:700}em{font-style:italic}hr{border:0;height:1px;background:#ccc;margin:25px 0}blockquote{border-left:4px solid #ddd;padding-left:15px;margin-left:0;color:#555;font-style:italic}pre{background-color:#f7f7f7;padding:15px;border-radius:4px;overflow-x:auto;font-family:'Courier New',Courier,monospace;font-size:13px}code{font-family:'Courier New',Courier,monospace;background-color:#f0f0f0;padding:2px 4px;border-radius:3px;font-size:.9em}pre code{background-color:transparent;padding:0}</style></head><body>${typeof marked !== 'undefined' ? marked.parse(rawMarkdownForDownload) : '<pre>' + rawMarkdownForDownload + '</pre>'}</body></html>`;
             const blob = new Blob([htmlToDownload], { type: 'text/html;charset=utf-8' });
             const today = new Date();
             const dateString = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
-            const filenameProjectPart = projectNameInput.value.trim().replace(/\s+/g, '_') || projectSelectDropdown.value.replace(/\s+/g, '_') || 'General';
+            const filenameProjectPart = projectNameInput.value.trim().replace(/[^\w.-]/g, '_') || projectSelectDropdown.value.replace(/[^\w.-]/g, '_') || 'General';
             const filename = `SuDS_Enviro_Proposal_${filenameProjectPart}_${dateString}.html`;
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob); link.download = filename;
@@ -359,18 +475,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Initial page setup
-    loadApiKey();       // Load API key from storage first
-    loadInitialData();  // Then load project data and populate UI
+    // --- Initial Page Load ---
+    loadApiKey();
+    loadInitialData();
 
+    // --- Storage Event Listener ---
     window.addEventListener('storage', function(event) {
         if (event.key === projectDataStorageKey) {
-            console.log('Project data changed in another tab. Reloading view.');
-            loadInitialData();
+            loadInitialData(); // Reload project data and UI if changed in another tab
         }
         if (event.key === userApiKeyStorageKey) {
-            console.log('API key changed in another tab. Reloading key.');
-            loadApiKey(); // Reload the key if it's changed elsewhere
+            loadApiKey(); // Reload API key if changed in another tab
         }
     });
 });

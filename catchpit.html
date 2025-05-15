@@ -7,25 +7,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css"> <!-- Link to shared/global CSS -->
+    <link rel="stylesheet" href="css/style.css">
 
-    <!-- Internal CSS specific to the Catchpit Configurator Form -->
     <style>
-        /* --- Copied CSS from original catchpit.html <style> block --- */
-        /* This ensures the form elements are styled correctly */
-        :root { /* These variables might be duplicated if also in style.css, but harmless */
+        /* Internal CSS specific to the Catchpit Configurator Form */
+        :root {
             --suds-blue: #1d80b9; --suds-green: #54b54d; --suds-red: #c34c4a;
             --suds-text-dark: #333; --suds-text-heading: var(--suds-blue);
             --suds-text-label-green: var(--suds-green); --suds-border-light: #d1d5db;
             --suds-bg-light: #f9fafb; --suds-bg-conditional: #eef7ff;
             --suds-select-bg: #e0e8f0; --suds-select-arrow: var(--suds-blue);
         }
-        /* body styling here is overridden by global style.css, but form-specific styles below are crucial */
-        /* body {
-            font-family: 'Montserrat', sans-serif; line-height: 1.6; margin: 0; padding: 20px;
-            background-color: #f0f2f5; color: var(--suds-text-dark);
-            padding-top: 80px;
-        } */
         .suds-configurator-form {
             max-width: 750px; margin: 20px auto; padding: 30px; background: #fff;
             border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
@@ -34,7 +26,7 @@
             border: 1px solid var(--suds-border-light); padding: 25px; margin-bottom: 30px;
             border-radius: 6px; background-color: var(--suds-bg-light);
         }
-        .suds-configurator-form h2, .suds-configurator-form h3 { /* Specific to configurator form headings */
+        .suds-configurator-form h2, .suds-configurator-form h3 {
             color: var(--suds-text-heading); font-weight: 700; margin-top: 0;
             padding-bottom: 12px; border-bottom: 2px solid var(--suds-blue);
             text-transform: uppercase;
@@ -90,20 +82,16 @@
         #cost_price_label, #sell_price_label { color: var(--suds-text-heading); margin-right: 10px; font-weight: 700; }
         #cost_price_value, #sell_price_value { color: var(--suds-green); font-weight: 700; min-width: 70px; }
         #sell_price_value { color: var(--suds-blue); }
-
-        /* Ensure body padding top is correctly handled by global CSS based on navbar height */
         @media (max-width: 768px){
             .suds-configurator-form h2{font-size:1.6em}
             .suds-configurator-form h3{font-size:1.3em}
             .suds-configurator-form{padding:20px}
             #shopping_list_summary::after{display:none}
             .markup-group {max-width: none;}
-            /* body {padding-top: 110px;} /* This should be handled by global style.css */
         }
     </style>
 </head>
 <body>
-   <!-- NEW NAVBAR - Standardized -->
 <nav class="navbar">
     <a href="index.html" class="nav-logo">
         <img src="assets/images/logo_horizontal.png" alt="SuDS Enviro Logo">
@@ -121,14 +109,21 @@
         <li><a href="orifice.html">Orifice Config</a></li>
         <li><a href="universal_chamber.html">Chamber Config</a></li>
         <li><a href="separator.html">Separator Config</a></li>
-        <!-- Add link to ai_analyzer.html here later if needed -->
     </ul>
 </nav>
 
     <form id="sudsCatchpitForm" class="suds-configurator-form">
+        <!-- NEW: Customer/Project Name Input -->
+        <div class="suds-form-group">
+            <label class="suds-label" for="customer_project_name" style="color: var(--suds-blue); font-weight: 700;">Customer / Project Name:</label>
+            <input type="text" id="customer_project_name" name="customer_project_name" class="suds-input" placeholder="e.g., Bob Co. - Site A (Leave blank for default project)">
+        </div>
+        <hr style="margin: 5px 0 25px 0;">
+        <!-- END NEW INPUT -->
+
         <div class="suds-form-section">
             <h2>Catchpit Configuration</h2>
-
+            <!-- ... rest of your original form content from here ... -->
             <h3>Catchpit Properties</h3>
             <div class="suds-form-group">
                 <label class="suds-label" for="cp_type">Catchpit Type:</label>

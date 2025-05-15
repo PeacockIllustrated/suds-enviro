@@ -37,6 +37,7 @@
             <label for="project-select" style="display:block; font-weight:700; margin-bottom:8px; font-size: 1.1em; color: var(--suds-blue);">View Configurations for Project:</label>
             <select id="project-select" class="suds-select" style="width:100%; max-width:450px; margin: 0 auto; display:block; padding: 10px 15px; font-size: 1em;">
                 <option value="">-- Select a Project --</option>
+                <!-- Options will be populated by JS -->
             </select>
         </div>
 
@@ -81,8 +82,9 @@
 
             <div class="action-buttons-container">
                 <button id="generate-proposal-btn">Generate Proposal (from Selected Project)</button>
-                <b<button id="copy-markdown-btn" style="display: none; background-color: var(--suds-text-dark);">Copy Markdown</button>
-                <button id="download-proposal-btn" style="display: none;">Download Proposal (.html)</button>
+                <!-- Ensure this button is present and correctly ID'd -->
+                <button id="copy-markdown-btn" style="display: none; background-color: var(--suds-text-dark); margin-left: 10px;">Copy Markdown</button>
+                <button id="download-proposal-btn" style="display: none; margin-left: 10px;">Download Proposal (.html)</button>
             </div>
             <div id="proposal-status"></div>
             <div id="proposal-output">
@@ -96,7 +98,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="js/all_configs.js"></script>
+    <script src="js/all_configs.js"></script> <!-- Should contain the JS provided in the previous step -->
     <script src="js/main.js" defer></script>
 </body>
 </html>

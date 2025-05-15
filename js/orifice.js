@@ -1,17 +1,21 @@
 // js/orifice.js
 document.addEventListener('DOMContentLoaded', function() {
-    // Pricing Rules for Orifice Flow Control
-    const pricingRules = { base: 70.00, adoptable_status: {'adoptable': 60.00, 'non_adoptable': 0}, depth_base: 80.00, depth_per_150mm_step: 15.00, diameter: {'315mm': 0, '450mm': 50.00, '600mm': 110.00, '1050mm': 280.00}, pipe_size_connection: { '110mm': 10.00, '160mm': 15.00, '225mm': 25.00 }, orifice_plate_base: 45.00, orifice_diameter_adder: 0.25, bypass_adder: 120.00 };
+    const pricingRules = { /* ... (your existing pricingRules) ... */
+        base: 70.00, adoptable_status: {'adoptable': 60.00, 'non_adoptable': 0}, depth_base: 80.00,
+        depth_per_150mm_step: 15.00, diameter: {'315mm': 0, '450mm': 50.00, '600mm': 110.00, '1050mm': 280.00},
+        pipe_size_connection: { '110mm': 10.00, '160mm': 15.00, '225mm': 25.00 },
+        orifice_plate_base: 45.00, orifice_diameter_adder: 0.25, bypass_adder: 120.00
+    };
 
-    // DOM References
     const form = document.getElementById('sudsOrificeForm');
     const submitStatus = document.getElementById('suds_submit_status');
-    // const webhookUrl = 'https://mkiminstest.app.n8n.cloud/webhook-test/862c9207-f6dd-4ee7-ae40-4658d15de3d0'; // Can remove if not used
     const productCodeDisplay = document.getElementById('suds_product_code_display');
     const shoppingListItemsUl = document.getElementById('shopping_list_items');
     const costPriceValueSpan = document.getElementById('cost_price_value');
     const sellPriceValueSpan = document.getElementById('sell_price_value');
     const profitMarkupInput = document.getElementById('profit_markup_percent');
+    const customerProjectNameInput = document.getElementById('customer_project_name'); // New input
+
     const chamberDepthSelect = document.getElementById('ofc_chamber_depth');
     const chamberDiameterSelect = document.getElementById('ofc_chamber_diameter');
     const adoptableStatusGroup = document.getElementById('adoptable_status_group');
@@ -20,28 +24,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const headHeightInput = document.getElementById('ofc_head_height');
     const orificeDiameterInput = document.getElementById('ofc_orifice_diameter');
     const bypassGroup = document.getElementById('bypass_group');
-    const savedConfigStorageKey = 'sudsSavedConfigs';
+
+    const projectDataStorageKey = 'sudsUserProjectsData'; // New localStorage key
+    const DEFAULT_PROJECT_NAME = "_DEFAULT_PROJECT_";
 
     // --- Helper Functions ---
-    function formatCurrency(value) { return `£${value.toFixed(2)}`; }
-
-    function populateDepthOptions() {
+    function formatCurrency(value) { /* ... (no change) ... */ return `£${value.toFixed(2)}`; }
+    function populateDepthOptions() { /* ... (no change from your existing function, ensure it calls updateQuoteAndCode) ... */
         const selectedAdoptable = document.querySelector('input[name="adoptable_status"]:checked');
         const adoptableValue = selectedAdoptable?.value;
         const currentDepthValue = chamberDepthSelect.value;
         chamberDepthSelect.innerHTML = '';
         if (!adoptableValue) {
             chamberDepthSelect.disabled = true; const o = document.createElement('option'); o.value = ""; o.textContent = "-- Select Adoptable Status First --"; chamberDepthSelect.appendChild(o);
-            updateProductCodeDisplay(); updateQuoteDisplay(); return;
+            updateQuoteAndCode(); return;
         }
         chamberDepthSelect.disabled = false; const dO = document.createElement('option'); dO.value = ""; dO.textContent = "-- Select Depth --"; chamberDepthSelect.appendChild(dO);
         const minD = 600; const maxD = (adoptableValue === 'adoptable') ? 3000 : 6000; const inc = 150;
         for (let d = minD; d <= maxD; d += inc) { const o = document.createElement('option'); o.value = d; o.textContent = `${d}mm`; chamberDepthSelect.appendChild(o); }
         if (currentDepthValue && chamberDepthSelect.querySelector(`option[value="${currentDepthValue}"]`)) { chamberDepthSelect.value = currentDepthValue; } else { chamberDepthSelect.value = ""; }
-        updateProductCodeDisplay(); updateQuoteDisplay();
+        updateQuoteAndCode();
     }
 
-    function calculateQuote() {
+    function calculateQuote() { /* ... (no change from your existing function) ... */
         let totalCost = 0; const items = []; const formData = new FormData(form);
         totalCost += pricingRules.base; items.push({ description: "Orifice Chamber Base", cost: pricingRules.base });
         const adoptableStatus = formData.get('adoptable_status'); if (adoptableStatus && pricingRules.adoptable_status[adoptableStatus]) { const c = pricingRules.adoptable_status[adoptableStatus]; if (c > 0) items.push({ description: `Status: ${adoptableStatus.charAt(0).toUpperCase() + adoptableStatus.slice(1)}`, cost: c }); totalCost += c; }
@@ -53,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (orificeDiameter && orificeDiameter > 0) {
             plateCost += orificeDiameter * pricingRules.orifice_diameter_adder;
             items.push({ description: `Orifice Plate (${orificeDiameter}mm)`, cost: plateCost });
-        } else { // Default cost if diameter is not specified (or calculated elsewhere)
+        } else {
             items.push({ description: `Orifice Plate (Standard/Calculated)`, cost: plateCost });
         }
         totalCost += plateCost;
@@ -61,14 +66,13 @@ document.addEventListener('DOMContentLoaded', function() {
         return { total: totalCost, items: items };
     }
 
-
-    function updateQuoteDisplay() {
+    function updateQuoteDisplay() { /* ... (no change from your existing function) ... */
         const quote = calculateQuote(); const costPrice = quote.total; const markupPercent = parseFloat(profitMarkupInput.value) || 0; const sellPrice = costPrice * (1 + markupPercent / 100);
         shoppingListItemsUl.innerHTML = ''; if (quote.items.length > 0) { quote.items.forEach(item => { const li = document.createElement('li'); li.innerHTML = `<span class="item-description">${item.description}</span><span class="item-cost">${formatCurrency(item.cost)}</span>`; shoppingListItemsUl.appendChild(li); }); } else { shoppingListItemsUl.innerHTML = '<li>Select options to see quote...</li>'; }
         costPriceValueSpan.textContent = formatCurrency(costPrice); sellPriceValueSpan.textContent = formatCurrency(sellPrice);
     }
 
-    function updateProductCodeDisplay() {
+    function updateProductCodeDisplay() { /* ... (no change from your existing function) ... */
         const adoptableSelected = form.querySelector('input[name="adoptable_status"]:checked');
         const adoptableCode = adoptableSelected ? (adoptableSelected.value === 'adoptable' ? 'AD' : 'NA') : 'ADSTAT';
         const depth = chamberDepthSelect.value || 'DEPTH';
@@ -84,42 +88,44 @@ document.addEventListener('DOMContentLoaded', function() {
         productCodeDisplay.textContent = `OFC-${diameter}-${depth}-${flow}-${head}-${adoptableCode}${bypassCode}`;
     }
 
-    function updateQuoteAndCode() { updateProductCodeDisplay(); updateQuoteDisplay(); }
+    function updateQuoteAndCode() { /* ... (no change) ... */
+        updateProductCodeDisplay();
+        updateQuoteDisplay();
+    }
 
-    const elementsTriggeringUpdates = [chamberDepthSelect, chamberDiameterSelect, adoptableStatusGroup, pipeworkSizeSelect, targetFlowInput, headHeightInput, orificeDiameterInput, profitMarkupInput, bypassGroup];
-    elementsTriggeringUpdates.forEach(el => {
+    const elementsTriggeringUpdates = [ /* ... (no change) ... */
+        chamberDepthSelect, chamberDiameterSelect, adoptableStatusGroup, pipeworkSizeSelect,
+        targetFlowInput, headHeightInput, orificeDiameterInput, profitMarkupInput, bypassGroup
+    ];
+    elementsTriggeringUpdates.forEach(el => { /* ... (no change) ... */
         if(el) {
             el.addEventListener('change', updateQuoteAndCode);
             if (el.type === 'number' || el.type === 'text') { el.addEventListener('keyup', updateQuoteAndCode); el.addEventListener('input', updateQuoteAndCode); }
         }
     });
-
-    if (adoptableStatusGroup) {
+    if (adoptableStatusGroup) { /* ... (no change) ... */
         Array.from(adoptableStatusGroup.querySelectorAll('input[type="radio"]')).forEach(radio => {
            radio.addEventListener('change', () => { populateDepthOptions(); });
        });
     }
-    if (bypassGroup) {
+    if (bypassGroup) { /* ... (no change) ... */
         Array.from(bypassGroup.querySelectorAll('input[type="radio"]')).forEach(radio => {
            radio.addEventListener('change', updateQuoteAndCode);
        });
     }
 
-
-    populateDepthOptions(); updateProductCodeDisplay(); updateQuoteDisplay();
+    populateDepthOptions(); // Initial call
 
     form.addEventListener('submit', function(event) {
-        event.preventDefault(); submitStatus.textContent = 'Submitting...'; submitStatus.className = '';
+        event.preventDefault();
+        // ... (validation logic remains the same) ...
+        let isValid = true;
         form.querySelectorAll('.suds-input, .suds-select').forEach(el => el.style.borderColor = '');
         if(adoptableStatusGroup) adoptableStatusGroup.style.outline = 'none';
-
-        let isValid = true;
         const adoptableSelected = form.querySelector('input[name="adoptable_status"]:checked');
         if (!adoptableSelected) { isValid = false; if(adoptableStatusGroup) adoptableStatusGroup.style.outline = '2px solid var(--suds-red)'; }
-
         const requiredStaticFields = form.querySelectorAll('#ofc_chamber_depth[required], #ofc_chamber_diameter[required], #ofc_pipework_size[required], #ofc_target_flow[required], #ofc_head_height[required]');
         requiredStaticFields.forEach(input => { if ((input.tagName === 'SELECT' && input.value === "") || (input.tagName !== 'SELECT' && !input.value.trim())) { isValid = false; input.style.borderColor = 'var(--suds-red)'; } });
-
         if (!isValid) {
             submitStatus.textContent = 'Please fill in all required fields.'; submitStatus.className = 'suds_status_error';
             const firstInvalidField = form.querySelector('[style*="border-color: var(--suds-red)"], [style*="outline"]');
@@ -130,36 +136,54 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } return;
         }
+        // --- END Validation ---
 
         const payload = buildJsonPayload();
+        const projectName = customerProjectNameInput.value.trim() || DEFAULT_PROJECT_NAME;
 
         try {
+            let allProjects = {};
+            const existingProjectsRaw = localStorage.getItem(projectDataStorageKey);
+            if (existingProjectsRaw) {
+                try {
+                    allProjects = JSON.parse(existingProjectsRaw);
+                    if (typeof allProjects !== 'object' || allProjects === null) allProjects = {};
+                } catch (e) {
+                    console.error("Error parsing existing project data:", e);
+                    allProjects = {};
+                }
+            }
+
+            if (!allProjects[projectName]) {
+                allProjects[projectName] = [];
+            }
+
             const configToSave = { ...payload };
             configToSave.savedId = `suds-ofc-${Date.now()}`;
             configToSave.savedTimestamp = new Date().toISOString();
-            // derived_product_name is in buildJsonPayload
 
-            const existingConfigsRaw = localStorage.getItem(savedConfigStorageKey);
-            let savedConfigs = [];
-            if (existingConfigsRaw) { try { savedConfigs = JSON.parse(existingConfigsRaw); if (!Array.isArray(savedConfigs)) savedConfigs = []; } catch (e) { console.error("Error parsing localStorage:", e); savedConfigs = []; } }
+            allProjects[projectName].push(configToSave);
+            localStorage.setItem(projectDataStorageKey, JSON.stringify(allProjects));
 
-            savedConfigs.push(configToSave);
-            localStorage.setItem(savedConfigStorageKey, JSON.stringify(savedConfigs));
-            submitStatus.textContent = 'Orifice configuration saved successfully!';
+            submitStatus.textContent = `Orifice configuration saved to project: ${projectName}!`;
             submitStatus.className = 'suds_status_success';
+
         } catch (storageError) {
-            console.error("Error saving to localStorage:", storageError);
+            console.error("Error saving Orifice configuration to project:", storageError);
             submitStatus.textContent = 'Saving to local storage failed: ' + (storageError.message || 'Unknown error.');
             submitStatus.className = 'suds_status_error';
         }
 
-        form.reset(); populateDepthOptions(); updateProductCodeDisplay(); updateQuoteDisplay();
+        form.reset();
+        customerProjectNameInput.value = '';
+        populateDepthOptions();
+        // updateProductCodeDisplay(); // Already called by populateDepthOptions -> updateQuoteAndCode
+        // updateQuoteDisplay();
     });
 
-    function buildJsonPayload() {
+    function buildJsonPayload() { /* ... (no change from your existing function) ... */
         const formData = new FormData(form); const quote = calculateQuote(); const costPrice = quote.total; const markupPercent = parseFloat(profitMarkupInput.value) || 0; const sellPrice = costPrice * (1 + markupPercent / 100);
         const derivedProductName = `OFC ${formData.get('ofc_target_flow') || 'N/A'}LPS`;
-
         const payload = {
             product_type: "orifice_flow_control",
             adoptable_status: formData.get('adoptable_status'),
@@ -172,13 +196,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return payload;
     }
 
-    // Placeholder for AI integration
-    window.prefillFormFromAIScheduleData = function(data) {
+    window.prefillFormFromAIScheduleData = function(data) { /* ... (no change - still a placeholder) ... */
         console.log("Attempting to prefill Orifice form with AI data:", data);
-        // Logic to map 'data' (from AI schedule) to orifice form fields
-        // e.g., if data.hydro_brake === 'Y' or data.manhole_type suggests flow control
-        // You'll need to infer target_flow, head_height, or set defaults.
-        // Chamber details like depth/diameter can be prefilled.
         updateQuoteAndCode();
     };
 });

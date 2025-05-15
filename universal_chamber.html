@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuDS Enviro - Universal Chamber Configurator</title> <!-- Standardized -->
+    <title>SuDS Enviro - Universal Chamber Configurator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css"> <!-- Link to shared/global CSS -->
+    <link rel="stylesheet" href="css/style.css">
 
-    <!-- Internal CSS specific to the Universal Chamber Configurator Form -->
     <style>
-        /* --- Copied CSS from original universal_chamber.html <style> block --- */
+        /* Internal CSS specific to the Universal Chamber Configurator Form */
         :root {
             --suds-blue: #1d80b9; --suds-green: #54b54d; --suds-red: #c34c4a;
             --suds-text-dark: #333; --suds-text-heading: var(--suds-blue);
@@ -24,7 +23,6 @@
             --hotspot-inactive-hover-bg: rgba(195, 76, 74, 0.4);
             --hotspot-inactive-hover-border: var(--suds-red);
         }
-        /* body styling is handled by global style.css */
         .suds-configurator-form {
             max-width: 750px; margin: 20px auto; padding: 30px; background: #fff;
             border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
@@ -80,60 +78,22 @@
         .suds_status_success { background-color: #e8f5e9; color: var(--suds-green); border: 1px solid var(--suds-green); }
         .suds_status_error { background-color: #ffebee; color: var(--suds-red); border: 1px solid var(--suds-red); }
         .suds-error-message { color: var(--suds-red); font-size: 0.85em; margin-top: 6px; }
-
         .ic-visual-selector-container{display:flex;flex-direction:column;align-items:center;margin-bottom:25px}
         .ic-chamber-diagram{position:relative;width:250px;height:250px;margin:25px auto;border:2px solid transparent;background-size:contain;background-position:center center;background-repeat:no-repeat;transition:background-image .3s ease-in-out}
-        .ic-pipe-position{
-            position:absolute;
-            width:var(--hotspot-size);
-            height:var(--hotspot-size);
-            border-radius:50%;
-            display:flex;align-items:center;justify-content:center;
-            box-shadow:0 1px 3px rgba(0,0,0,.1);
-            transition:background-color .2s,border-color .2s,transform .15s ease-out,opacity .3s ease-in-out,visibility .3s ease-in-out;
-            opacity:1;visibility:visible;
-        }
+        .ic-pipe-position{position:absolute;width:var(--hotspot-size);height:var(--hotspot-size);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.1);transition:background-color .2s,border-color .2s,transform .15s ease-out,opacity .3s ease-in-out,visibility .3s ease-in-out;opacity:1;visibility:visible;}
         .ic-pipe-position.hidden-inlet{opacity:0;visibility:hidden;pointer-events:none}
-
-        .ic-pipe-position.ic-inlet{
-            cursor:pointer;
-            background-color: var(--hotspot-inactive-bg);
-            border: 2px solid var(--hotspot-inactive-border);
-        }
-        .ic-pipe-position.ic-inlet:hover{
-            background-color: var(--hotspot-inactive-hover-bg);
-            border-color: var(--hotspot-inactive-hover-border);
-            transform:scale(1.1)
-        }
-        .ic-pipe-position.ic-inlet.selected{
-            background-color:var(--suds-green);
-            border-color:#45a040;
-            transform:scale(1.1)
-        }
-        .ic-pipe-position.ic-inlet.selected::before {
-            content: ''; display: block; width: 65%; height: 65%;
-            background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M173.898%20439.404l-166.4-166.4c-9.997-9.997-9.997-26.206%200-36.204l36.203-36.204c9.997-9.998%2026.207-9.998%2036.204%200L192%20312.69%20432.095%2072.596c9.997-9.997%2026.207-9.997%2036.204%200l36.203%2036.204c9.997%209.997%209.997%2026.206%200%2036.204l-294.4%20294.401c-9.998%209.997-26.207%209.997-36.204-.001z%22%2F%3E%3C%2Fsvg%3E');
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-        }
-
-        .ic-pipe-position.ic-outlet{
-            background-color:var(--suds-red);
-            border-color:#b03d3b;
-            cursor:default;
-             color: white;
-        }
-        .ic-pipe-position.ic-outlet::after{
-             content:'➤';font-size:.75em;
-             transform:rotate(-90deg) translateX(1px);color:white;
-        }
-
+        .ic-pipe-position.ic-inlet{cursor:pointer;background-color: var(--hotspot-inactive-bg);border: 2px solid var(--hotspot-inactive-border);}
+        .ic-pipe-position.ic-inlet:hover{background-color: var(--hotspot-inactive-hover-bg);border-color: var(--hotspot-inactive-hover-border);transform:scale(1.1)}
+        .ic-pipe-position.ic-inlet.selected{background-color:var(--suds-green);border-color:#45a040;transform:scale(1.1)}
+        .ic-pipe-position.ic-inlet.selected::before {content: ''; display: block; width: 65%; height: 65%;background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M173.898%20439.404l-166.4-166.4c-9.997-9.997-9.997-26.206%200-36.204l36.203-36.204c9.997-9.998%2026.207-9.998%2036.204%200L192%20312.69%20432.095%2072.596c9.997-9.997%2026.207-9.997%2036.204%200l36.203%2036.204c9.997%209.997%209.997%2026.206%200%2036.204l-294.4%20294.401c-9.998%209.997-26.207%209.997-36.204-.001z%22%2F%3E%3C%2Fsvg%3E');background-size: contain; background-repeat: no-repeat; background-position: center;}
+        .ic-pipe-position.ic-outlet{background-color:var(--suds-red);border-color:#b03d3b;cursor:default; color: white;}
+        .ic-pipe-position.ic-outlet::after{content:'➤';font-size:.75em;transform:rotate(-90deg) translateX(1px);color:white;}
         .pos-1200-alt{top:-25px;left:calc(50% - var(--hotspot-size)/2)}
         .pos-0300-alt{top:calc(50% - var(--hotspot-size)/2);right:-25px}
         .pos-0600-alt{bottom:-25px;left:calc(50% - var(--hotspot-size)/2)}
         .pos-0900-alt{top:calc(50% - var(--hotspot-size)/2);left:-25px}
-        .pos-0500-alt{top:199px;left:199px} /* Adjusted for 250px diagram */
-        .pos-0700-alt{top:199px;left:19px}  /* Adjusted for 250px diagram */
-
+        .pos-0500-alt{top:199px;left:199px}
+        .pos-0700-alt{top:199px;left:19px}
         #inlet_selector_error_container{text-align:center;margin-top:15px}#active_inlet_configs_container{margin-top:25px}
         .inlet-config-block{border:1px solid var(--suds-blue);border-radius:8px;padding:20px;margin-bottom:25px;background-color:var(--suds-bg-conditional)}.inlet-config-block h4{margin-top:0;color:var(--suds-blue);font-size:1.2em;border-bottom:1px solid #cce4f3;padding-bottom:10px;font-weight:700}
         .suds-conditional-options{padding:15px;border-left:4px solid var(--suds-blue);margin-top:15px;margin-bottom:15px;background-color:#fff;border-radius:6px;box-shadow:inset 2px 0 5px rgba(29,128,185,.05)}
@@ -149,27 +109,22 @@
         #cost_price_label, #sell_price_label { color: var(--suds-text-heading); margin-right: 10px; font-weight: 700; }
         #cost_price_value, #sell_price_value { color: var(--suds-green); font-weight: 700; min-width: 70px; }
         #sell_price_value { color: var(--suds-blue); }
-
         @media (max-width: 768px){
             .suds-configurator-form h2{font-size:1.6em}
             .suds-configurator-form h3{font-size:1.3em}
-            .suds-configurator-form{padding:20px}
-            .ic-chamber-diagram{width:220px;height:220px}
+            .suds-configurator-form{padding:20px}.ic-chamber-diagram{width:220px;height:220px}
             .ic-pipe-position { width: calc(var(--hotspot-size) - 2px); height: calc(var(--hotspot-size) - 2px); }
             .pos-1200-alt{top:-23px;left:calc(50% - 15px)}
             .pos-0300-alt{top:calc(50% - 15px);right:-23px}
             .pos-0600-alt{bottom:-23px;left:calc(50% - 15px)}
             .pos-0900-alt{top:calc(50% - 15px);left:-23px}
-            .pos-0500-alt { top: 175px; left: 175px; } /* Adjusted for 220px diagram */
-            .pos-0700-alt { top: 175px; left: 15px; }  /* Adjusted for 220px diagram */
-            .inlet-remove-btn{float:none;display:block;width:100%;margin-top:10px;margin-bottom:5px}
-            #shopping_list_summary::after{display:none}
-            .markup-group {max-width: none;}
+            .pos-0500-alt { top: 175px; left: 175px; }
+            .pos-0700-alt { top: 175px; left: 15px; }
+            .inlet-remove-btn{float:none;display:block;width:100%;margin-top:10px;margin-bottom:5px}#shopping_list_summary::after{display:none}.markup-group {max-width: none;}
         }
     </style>
 </head>
 <body>
-   <!-- NEW NAVBAR - Standardized -->
 <nav class="navbar">
     <a href="index.html" class="nav-logo">
         <img src="assets/images/logo_horizontal.png" alt="SuDS Enviro Logo">
@@ -185,14 +140,23 @@
         <li><a href="all_configs.html">Saved Configurations</a></li>
         <li><a href="catchpit.html">Catchpit Config</a></li>
         <li><a href="orifice.html">Orifice Config</a></li>
-        <li><a href="universal_chamber.html" class="active">Chamber Config</a></li> <!-- Active Link -->
+        <li><a href="universal_chamber.html" class="active">Chamber Config</a></li>
         <li><a href="separator.html">Separator Config</a></li>
     </ul>
 </nav>
 
     <form id="sudsUniversalChamberForm" class="suds-configurator-form">
+        <!-- NEW: Customer/Project Name Input -->
+        <div class="suds-form-group">
+            <label class="suds-label" for="customer_project_name" style="color: var(--suds-blue); font-weight: 700;">Customer / Project Name:</label>
+            <input type="text" id="customer_project_name" name="customer_project_name" class="suds-input" placeholder="e.g., Bob Co. - Site A (Leave blank for default project)">
+        </div>
+        <hr style="margin: 5px 0 25px 0;">
+        <!-- END NEW INPUT -->
+
         <div class="suds-form-section">
             <h2>Universal Chamber Configuration</h2>
+            <!-- ... rest of your original form content ... -->
             <div class="suds-form-group">
                 <label class="suds-label" for="chamber_system_type">Chamber System Type:</label>
                 <select class="suds-select" id="chamber_system_type" name="chamber_system_type" required>
@@ -228,7 +192,7 @@
             <h3>Inlet Selection & Configuration</h3>
             <div class="ic-visual-selector-container">
                 <label class="suds-label">Click on diagram to activate/deactivate inlets:</label>
-                <div class="ic-chamber-diagram" id="chamberDiagram"> <!-- Background image set by JS -->
+                <div class="ic-chamber-diagram" id="chamberDiagram">
                     <div class="ic-pipe-position ic-outlet pos-1200-alt" title="Outlet (12:00 - Fixed)"></div>
                     <div class="ic-pipe-position ic-inlet pos-0300-alt" data-position="3:00" title="Toggle Inlet 3:00"></div>
                     <div class="ic-pipe-position ic-inlet pos-0500-alt" data-position="5:00" title="Toggle Inlet 5:00"></div>

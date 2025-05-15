@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SudsEnviro - Orifice Flow Control Configurator</title>
+    <title>SuDS Enviro - Orifice Flow Control Configurator</title> <!-- Standardized -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css"> <!-- Shared CSS -->
+    <link rel="stylesheet" href="css/style.css"> <!-- Link to shared/global CSS -->
+
+    <!-- Internal CSS specific to the Orifice Configurator Form -->
     <style>
-        /* --- Copied CSS from original Orifice form --- */
+        /* --- Copied CSS from original orifice.html <style> block --- */
         :root {
             --suds-blue: #1d80b9; --suds-green: #54b54d; --suds-red: #c34c4a;
             --suds-text-dark: #333; --suds-text-heading: var(--suds-blue);
@@ -17,11 +19,7 @@
             --suds-bg-light: #f9fafb; --suds-bg-conditional: #eef7ff;
             --suds-select-bg: #e0e8f0; --suds-select-arrow: var(--suds-blue);
         }
-        body {
-            font-family: 'Montserrat', sans-serif; line-height: 1.6; margin: 0; padding: 20px;
-            background-color: #f0f2f5; color: var(--suds-text-dark);
-            padding-top: 80px; /* Ensure content below navbar */
-        }
+        /* body styling is handled by global style.css */
         .suds-configurator-form {
             max-width: 750px; margin: 20px auto; padding: 30px; background: #fff;
             border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
@@ -30,13 +28,13 @@
             border: 1px solid var(--suds-border-light); padding: 25px; margin-bottom: 30px;
             border-radius: 6px; background-color: var(--suds-bg-light);
         }
-        h2, h3 {
+        .suds-configurator-form h2, .suds-configurator-form h3 {
             color: var(--suds-text-heading); font-weight: 700; margin-top: 0;
             padding-bottom: 12px; border-bottom: 2px solid var(--suds-blue);
             text-transform: uppercase;
         }
-        h2 { font-size: 1.8em; margin-bottom: 25px; }
-        h3 { font-size: 1.4em; margin-bottom: 20px; margin-top: 30px; border-bottom-width: 1px; }
+        .suds-configurator-form h2 { font-size: 1.8em; margin-bottom: 25px; }
+        .suds-configurator-form h3 { font-size: 1.4em; margin-bottom: 20px; margin-top: 30px; border-bottom-width: 1px; }
         .suds-form-group { margin-bottom: 20px; }
         .suds-label {
             display: block; margin-bottom: 8px; font-weight: 600;
@@ -86,24 +84,36 @@
         #cost_price_label, #sell_price_label { color: var(--suds-text-heading); margin-right: 10px; font-weight: 700; }
         #cost_price_value, #sell_price_value { color: var(--suds-green); font-weight: 700; min-width: 70px; }
         #sell_price_value { color: var(--suds-blue); }
-        @media (max-width: 768px){h2{font-size:1.6em}h3{font-size:1.3em}.suds-configurator-form{padding:20px}#shopping_list_summary::after{display:none}.markup-group {max-width: none;} body{padding-top: 110px; /* Adjust for taller mobile navbar */} }
+        @media (max-width: 768px){
+            .suds-configurator-form h2{font-size:1.6em}
+            .suds-configurator-form h3{font-size:1.3em}
+            .suds-configurator-form{padding:20px}
+            #shopping_list_summary::after{display:none}
+            .markup-group {max-width: none;}
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-logo">
-            <img src="https://uploads-ssl.webflow.com/6662e401ea62d861a416088f/6662e78d9725ab79209f1b60_Primary%20Logo%20-%20Colour.svg" alt="SuDS Enviro Logo">
-        </div>
-        <ul class="nav-links">
-            <li><a href="index.html">Tools Hub</a></li>
-            <li><a href="planner.html">Drainage Planner</a></li>
-            <li><a href="catchpit.html">Catchpit Configurator</a></li>
-            <li><a href="orifice.html" class="active">Orifice Configurator</a></li>
-            <li><a href="universal_chamber.html">Universal Chamber</a></li>
-            <li><a href="separator.html">Separator Configurator</a></li>
-            <li><a href="all_configs.html">Saved Configurations</a></li>
-        </ul>
-    </nav>
+   <!-- NEW NAVBAR - Standardized -->
+<nav class="navbar">
+    <a href="index.html" class="nav-logo">
+        <img src="assets/images/logo_horizontal.png" alt="SuDS Enviro Logo">
+    </a>
+    <button class="menu-toggle" id="mobileMenuToggle" aria-label="Toggle Menu" aria-expanded="false">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Tools Hub</a></li>
+        <li><a href="planner.html">Drainage Planner</a></li>
+        <li><a href="all_configs.html">Saved Configurations</a></li>
+        <li><a href="catchpit.html">Catchpit Config</a></li>
+        <li><a href="orifice.html" class="active">Orifice Config</a></li> <!-- Active Link -->
+        <li><a href="universal_chamber.html">Chamber Config</a></li>
+        <li><a href="separator.html">Separator Config</a></li>
+    </ul>
+</nav>
 
     <form id="sudsOrificeForm" class="suds-configurator-form">
         <div class="suds-form-section">
@@ -210,93 +220,7 @@
         <div id="suds_submit_status"></div>
     </form>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Pricing Rules for Orifice Flow Control
-        const pricingRules = { base: 70.00, adoptable_status: {'adoptable': 60.00, 'non_adoptable': 0}, depth_base: 80.00, depth_per_150mm_step: 15.00, diameter: {'315mm': 0, '450mm': 50.00, '600mm': 110.00, '1050mm': 280.00}, pipe_size_connection: { '110mm': 10.00, '160mm': 15.00, '225mm': 25.00 }, orifice_plate_base: 45.00, orifice_diameter_adder: 0.25, bypass_adder: 120.00 };
-
-        // DOM References
-        const form = document.getElementById('sudsOrificeForm');
-        const submitStatus = document.getElementById('suds_submit_status');
-        const webhookUrl = 'https://mkiminstest.app.n8n.cloud/webhook-test/862c9207-f6dd-4ee7-ae40-4658d15de3d0';
-        const productCodeDisplay = document.getElementById('suds_product_code_display');
-        const shoppingListItemsUl = document.getElementById('shopping_list_items');
-        const costPriceValueSpan = document.getElementById('cost_price_value');
-        const sellPriceValueSpan = document.getElementById('sell_price_value');
-        const profitMarkupInput = document.getElementById('profit_markup_percent');
-        const chamberDepthSelect = document.getElementById('ofc_chamber_depth');
-        const chamberDiameterSelect = document.getElementById('ofc_chamber_diameter');
-        const adoptableStatusGroup = document.getElementById('adoptable_status_group');
-        const pipeworkSizeSelect = document.getElementById('ofc_pipework_size');
-        const targetFlowInput = document.getElementById('ofc_target_flow');
-        const headHeightInput = document.getElementById('ofc_head_height');
-        const orificeDiameterInput = document.getElementById('ofc_orifice_diameter');
-        const bypassGroup = document.getElementById('bypass_group');
-        const savedConfigStorageKey = 'sudsSavedConfigs'; // LocalStorage Key
-
-        // --- Helper Functions ---
-        function formatCurrency(value) { return `£${value.toFixed(2)}`; }
-
-        function populateDepthOptions() { const selectedAdoptable = document.querySelector('input[name="adoptable_status"]:checked'); const adoptableValue = selectedAdoptable?.value; const currentDepthValue = chamberDepthSelect.value; chamberDepthSelect.innerHTML = ''; if (!adoptableValue) { chamberDepthSelect.disabled = true; const o=document.createElement('option');o.value="";o.textContent="-- Select Adoptable Status First --";chamberDepthSelect.appendChild(o);updateProductCodeDisplay();updateQuoteDisplay();return; } chamberDepthSelect.disabled = false; const dO=document.createElement('option');dO.value="";dO.textContent="-- Select Depth --";chamberDepthSelect.appendChild(dO); const minD=600; const maxD=(adoptableValue==='adoptable')?3000:6000; const inc=150; for (let d=minD; d<=maxD; d+=inc) { const o=document.createElement('option');o.value=d;o.textContent=`${d}mm`;chamberDepthSelect.appendChild(o); } if (currentDepthValue&&chamberDepthSelect.querySelector(`option[value="${currentDepthValue}"]`)){chamberDepthSelect.value=currentDepthValue;} else {chamberDepthSelect.value="";} updateProductCodeDisplay();updateQuoteDisplay(); }
-
-        function calculateQuote() { let totalCost = 0; const items = []; const formData = new FormData(form); totalCost += pricingRules.base; items.push({ description: "Orifice Chamber Base", cost: pricingRules.base }); const adoptableStatus = formData.get('adoptable_status'); if (adoptableStatus && pricingRules.adoptable_status[adoptableStatus]) { const c=pricingRules.adoptable_status[adoptableStatus]; if(c>0)items.push({description:`Status: ${adoptableStatus.charAt(0).toUpperCase() + adoptableStatus.slice(1)}`, cost: c }); totalCost += c; } const depth = parseFloat(formData.get('ofc_chamber_depth')); if (depth && depth >= 600) { let depthCost = pricingRules.depth_base; const steps = (depth - 600) / 150; depthCost += steps * pricingRules.depth_per_150mm_step; items.push({description:`Depth: ${depth}mm`,cost:depthCost}); totalCost+=depthCost; } const diameter = formData.get('ofc_chamber_diameter'); if (diameter && pricingRules.diameter[diameter]) { const c=pricingRules.diameter[diameter]; if(c>0)items.push({description:`Diameter: ${diameter}`,cost:c}); totalCost+=c; } const pipeSize = formData.get('ofc_pipework_size'); if (pipeSize && pricingRules.pipe_size_connection[pipeSize]){ const connectionCost = pricingRules.pipe_size_connection[pipeSize] * 2; items.push({description: `Inlet/Outlet Connections (${pipeSize})`, cost: connectionCost}); totalCost += connectionCost; } let plateCost = pricingRules.orifice_plate_base; const orificeDiameter = parseFloat(formData.get('ofc_orifice_diameter')); if(orificeDiameter && orificeDiameter > 0) { plateCost += orificeDiameter * pricingRules.orifice_diameter_adder; items.push({description: `Orifice Plate (${orificeDiameter}mm)`, cost: plateCost}); } else { items.push({description: `Orifice Plate (Calculated Size)`, cost: plateCost}); } totalCost += plateCost; const bypassRequired = formData.get('bypass_required'); if (bypassRequired === 'yes') { items.push({description: "Bypass Included", cost: pricingRules.bypass_adder}); totalCost += pricingRules.bypass_adder; } return { total: totalCost, items: items }; }
-
-        function updateQuoteDisplay() { const quote=calculateQuote(); const costPrice=quote.total; const markupPercent=parseFloat(profitMarkupInput.value)||0; const sellPrice=costPrice*(1+markupPercent/100); shoppingListItemsUl.innerHTML=''; if(quote.items.length>0){quote.items.forEach(item=>{const li=document.createElement('li');li.innerHTML=`<span class="item-description">${item.description}</span><span class="item-cost">${formatCurrency(item.cost)}</span>`;shoppingListItemsUl.appendChild(li);});}else{shoppingListItemsUl.innerHTML='<li>Select options to see quote...</li>';} costPriceValueSpan.textContent=formatCurrency(costPrice); sellPriceValueSpan.textContent=formatCurrency(sellPrice); }
-        function updateProductCodeDisplay() { const adoptable = document.querySelector('input[name="adoptable_status"]:checked')?.value === 'adoptable' ? 'AD' : 'NA'; const depth = chamberDepthSelect.value || 'DEPTH'; const diameter = chamberDiameterSelect.value ? chamberDiameterSelect.value.replace('mm','') : 'DIAM'; const flow = targetFlowInput.value ? targetFlowInput.value + 'LPS' : 'FLOW'; const head = headHeightInput.value ? headHeightInput.value + 'MHD' : 'HEAD'; const bypass = document.querySelector('input[name="bypass_required"]:checked')?.value === 'yes' ? '-BY' : ''; const adoptableSelected = form.querySelector('input[name="adoptable_status"]:checked'); if(depth === 'DEPTH' || diameter === 'DIAM' || flow === 'FLOW' || head === 'HEAD' || !adoptableSelected || !chamberDepthSelect.value) { productCodeDisplay.textContent='Please complete selections...'; return; } productCodeDisplay.textContent = `OFC-${diameter}-${depth}-${flow}-${head}-${adoptable}${bypass}`; }
-        function updateQuoteAndCode() { updateProductCodeDisplay(); updateQuoteDisplay(); }
-
-        const elementsTriggeringUpdates = [ chamberDepthSelect, chamberDiameterSelect, adoptableStatusGroup, pipeworkSizeSelect, targetFlowInput, headHeightInput, orificeDiameterInput, profitMarkupInput, bypassGroup ];
-        elementsTriggeringUpdates.forEach(el => { el.addEventListener('change', updateQuoteAndCode); if (el.type === 'number' || el.type === 'text') { el.addEventListener('keyup', updateQuoteAndCode); el.addEventListener('input', updateQuoteAndCode); } });
-        adoptableStatusGroup.addEventListener('change', () => { populateDepthOptions(); });
-
-        populateDepthOptions(); updateProductCodeDisplay(); updateQuoteDisplay();
-
-        form.addEventListener('submit', function(event) {
-             event.preventDefault(); submitStatus.textContent = 'Submitting...'; submitStatus.className = ''; form.querySelectorAll('.suds-input, .suds-select').forEach(el => el.style.borderColor = ''); adoptableStatusGroup.style.outline = 'none'; let isValid = true; const adoptableSelected = form.querySelector('input[name="adoptable_status"]:checked'); if (!adoptableSelected) { isValid = false; adoptableStatusGroup.style.outline = '2px solid var(--suds-red)'; } else { adoptableStatusGroup.style.outline = 'none'; }
-             const requiredStaticFields = form.querySelectorAll('#ofc_chamber_depth[required], #ofc_chamber_diameter[required], #ofc_pipework_size[required], #ofc_target_flow[required], #ofc_head_height[required]');
-             requiredStaticFields.forEach(input => { if ((input.tagName === 'SELECT' && input.value === "") || (input.tagName !== 'SELECT' && !input.value.trim())) { isValid = false; input.style.borderColor = 'var(--suds-red)'; } else { input.style.borderColor = ''; } });
-             if (!isValid) { submitStatus.textContent = 'Please fill in all required fields.'; submitStatus.className = 'suds_status_error'; const firstInvalidField = form.querySelector('[style*="border-color: var(--suds-red)"], [style*="outline"]'); if (firstInvalidField) { if (firstInvalidField.id === 'adoptable_status_group') firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' }); else { firstInvalidField.focus(); firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' }); } } return; }
-
-             const payload = buildJsonPayload(); // Get payload before fetch
-
-             // Optional Webhook submission can be kept or removed
-             // fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(...)
-
-             // --- Save to localStorage ---
-             try {
-                 const configToSave = { ...payload };
-                 configToSave.savedId = `suds-ofc-${Date.now()}`;
-                 configToSave.savedTimestamp = new Date().toISOString();
-                 // Add derived_product_name for planner
-                 configToSave.derived_product_name = `OFC ${configToSave.flow_control_params.target_flow_lps || 'N/A'}LPS`;
-
-
-                 const existingConfigsRaw = localStorage.getItem(savedConfigStorageKey);
-                 let savedConfigs = [];
-                 if (existingConfigsRaw) { try { savedConfigs = JSON.parse(existingConfigsRaw); if (!Array.isArray(savedConfigs)) savedConfigs = []; } catch (e) { console.error("Error parsing existing localStorage data:", e); savedConfigs = []; } }
-
-                 savedConfigs.push(configToSave);
-                 localStorage.setItem(savedConfigStorageKey, JSON.stringify(savedConfigs));
-                 console.log("Orifice configuration saved to localStorage.");
-                 submitStatus.textContent = 'Orifice configuration saved successfully!';
-                 submitStatus.className = 'suds_status_success';
-             } catch (storageError) {
-                 console.error("Error saving Orifice configuration to localStorage:", storageError);
-                 submitStatus.textContent = 'Saving to local storage failed: ' + (storageError.message || 'Unknown error.');
-                 submitStatus.className = 'suds_status_error';
-             }
-             // --- End localStorage Save ---
-
-             form.reset(); populateDepthOptions(); updateProductCodeDisplay(); updateQuoteDisplay();
-        });
-
-        function buildJsonPayload() {
-            const formData = new FormData(form); const quote = calculateQuote(); const costPrice = quote.total; const markupPercent = parseFloat(profitMarkupInput.value) || 0; const sellPrice = costPrice * (1 + markupPercent / 100);
-            const payload = { product_type: "orifice_flow_control", adoptable_status: formData.get('adoptable_status'), generated_product_code: productCodeDisplay.textContent.startsWith('Please') ? null : productCodeDisplay.textContent, chamber_details: { chamber_depth_mm: parseFloat(formData.get('ofc_chamber_depth'))||null, chamber_diameter: formData.get('ofc_chamber_diameter'), pipework_size: formData.get('ofc_pipework_size') }, flow_control_params: { target_flow_lps: parseFloat(formData.get('ofc_target_flow')) || null, design_head_m: parseFloat(formData.get('ofc_head_height')) || null, orifice_diameter_mm: parseFloat(formData.get('ofc_orifice_diameter')) || null, bypass_required: formData.get('bypass_required') === 'yes' }, quote_details: { items: quote.items, cost_price: costPrice, profit_markup_percent: markupPercent, estimated_sell_price: sellPrice } };
-            return payload;
-        }
-
-    });
-    </script>
+    <script src="js/orifice.js" defer></script>
+    <script src="js/main.js" defer></script>
 </body>
 </html>
